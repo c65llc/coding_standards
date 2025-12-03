@@ -79,6 +79,28 @@ if [ -n "$CURSOR_COMMANDS_SOURCE" ] && [ -d "$CURSOR_COMMANDS_SOURCE" ]; then
     echo "✅ Cursor commands synced"
 fi
 
+# Update git aliases if setup script exists
+if [ -d "$STANDARDS_DIR" ]; then
+    GIT_ALIASES_SCRIPT="$STANDARDS_DIR/scripts/setup-git-aliases.sh"
+elif [ -f "$SCRIPT_DIR/setup-git-aliases.sh" ]; then
+    GIT_ALIASES_SCRIPT="$SCRIPT_DIR/setup-git-aliases.sh"
+else
+    GIT_ALIASES_SCRIPT=""
+fi
+
+if [ -n "$GIT_ALIASES_SCRIPT" ] && [ -f "$GIT_ALIASES_SCRIPT" ] && command -v git >/dev/null 2>&1; then
+    if [ "$UPDATED" = true ]; then
+        echo ""
+        echo "🔧 Updating git aliases and configuration..."
+        echo "   (New aliases may be available from updated standards)"
+        if bash "$GIT_ALIASES_SCRIPT" 2>/dev/null; then
+            echo "✅ Git aliases updated"
+        else
+            echo "⚠️  Git aliases update had issues (non-fatal, continuing...)"
+        fi
+    fi
+fi
+
 # Check for new standards files
 if [ -d "$STANDARDS_DIR" ] || [ "$SCRIPT_DIR" = "$PROJECT_ROOT" ]; then
     STANDARDS_FILES_DIR="${STANDARDS_DIR:-$SCRIPT_DIR/..}"

@@ -70,7 +70,7 @@ if [ -f "$STANDARDS_DIR/.gitmodules" ] || [ -f "$PROJECT_ROOT/.gitmodules" ]; th
     git submodule update --init --recursive "$STANDARDS_DIR" 2>/dev/null || true
 fi
 
-# Run setup script
+# Run setup script (includes git aliases setup)
 echo -e "${BLUE}🔧 Running setup script...${NC}"
 if [ -f "$STANDARDS_DIR/scripts/setup.sh" ]; then
     bash "$STANDARDS_DIR/scripts/setup.sh"

@@ -43,7 +43,29 @@ Every project MUST include the following targets in the root `Makefile`:
 * **Goal:** Initialize version control.
 * **Action:** Configures git hooks (pre-commit), submodules, and local git settings.
 
+### `make ls`
+* **Goal:** List all available make targets.
+* **Action:** Dumps a simple list of all defined targets (without descriptions).
+* **Usage:** Quick reference for available commands. Complements `make help` which shows descriptions.
+
 ## 3. Implementation Guidelines
 * **Phony Targets:** Always declare `.PHONY` for all commands.
 * **Help:** Include a `help` target that lists commands and descriptions (default target).
+* **List Targets:** Include an `ls` target that lists all available make targets without descriptions for quick reference.
 * **Idempotency:** Commands should be safe to run multiple times without side effects.
+
+### Implementation Example for `make ls`
+
+The `ls` target should extract and list all target names from the Makefile:
+
+```makefile
+.PHONY: ls
+ls: ## List all available make targets
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sed 's/:.*//' | sort
+```
+
+This implementation:
+* Extracts targets that have descriptions (matches the pattern used by `help` target)
+* Removes the colon and everything after it
+* Sorts the list alphabetically
+* Produces a clean list of target names only

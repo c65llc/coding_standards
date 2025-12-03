@@ -75,6 +75,37 @@ HOOK
     echo "✅ Git hooks installed"
 fi
 
+# Set up git aliases (global configuration)
+if command -v git >/dev/null 2>&1; then
+    # Determine path to setup-git-aliases.sh
+    if [ "$SCRIPT_DIR" = "$PROJECT_ROOT" ]; then
+        # We're in the standards repo itself
+        GIT_ALIASES_SCRIPT="$SCRIPT_DIR/setup-git-aliases.sh"
+    else
+        # We're in a project using standards
+        if [ -d "$STANDARDS_DIR" ]; then
+            GIT_ALIASES_SCRIPT="$STANDARDS_DIR/scripts/setup-git-aliases.sh"
+        elif [ -f "$SCRIPT_DIR/setup-git-aliases.sh" ]; then
+            GIT_ALIASES_SCRIPT="$SCRIPT_DIR/setup-git-aliases.sh"
+        else
+            GIT_ALIASES_SCRIPT=""
+        fi
+    fi
+    
+    if [ -n "$GIT_ALIASES_SCRIPT" ] && [ -f "$GIT_ALIASES_SCRIPT" ]; then
+        echo ""
+        echo "🔧 Setting up git aliases..."
+        echo "   (This configures global git aliases for your system)"
+        if bash "$GIT_ALIASES_SCRIPT"; then
+            echo "✅ Git aliases configured"
+        else
+            echo "⚠️  Git aliases setup had issues (non-fatal, continuing...)"
+        fi
+    fi
+else
+    echo "⚠️  Git not found. Skipping git aliases setup."
+fi
+
 # Create .gitignore entry if needed
 if [ -f "$PROJECT_ROOT/.gitignore" ]; then
     if ! grep -q ".cursorrules.backup" "$PROJECT_ROOT/.gitignore" 2>/dev/null; then

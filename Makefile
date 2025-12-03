@@ -1,10 +1,13 @@
-.PHONY: help setup sync-standards check-standards update-standards
+.PHONY: help ls setup sync-standards check-standards update-standards
 
 help: ## Show this help message
 	@echo "Standards Repository Management"
 	@echo ""
 	@echo "Available targets:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+ls: ## List all available make targets
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sed 's/:.*//' | sort
 
 setup: ## Run setup script to configure standards in a project
 	@./scripts/setup.sh

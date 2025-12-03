@@ -2,13 +2,11 @@
 # One-line installer for project standards
 # 
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/c65llc/coding_standards/main/install.sh | bash
 #
 # Or with custom repository URL:
-#   STANDARDS_REPO_URL="https://github.com/your-org/project-standards" \
-#     curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/install.sh | bash
-#
-# NOTE: Replace YOUR_USERNAME and YOUR_REPO with your actual GitHub username and repository name
+#   STANDARDS_REPO_URL="https://github.com/c65llc/coding_standards" \
+#     curl -fsSL https://raw.githubusercontent.com/c65llc/coding_standards/main/install.sh | bash
 
 set -e
 
@@ -48,14 +46,9 @@ fi
 
 # Get repository URL if not provided
 if [ -z "$STANDARDS_REPO_URL" ]; then
-    echo -e "${BLUE}📋 Enter the standards repository URL:${NC}"
-    echo "   Example: https://github.com/your-org/project-standards"
-    read -p "Repository URL: " STANDARDS_REPO_URL
-    
-    if [ -z "$STANDARDS_REPO_URL" ]; then
-        echo -e "${RED}❌ Repository URL is required${NC}"
-        exit 1
-    fi
+    STANDARDS_REPO_URL="https://github.com/c65llc/coding_standards"
+    echo -e "${BLUE}📋 Using default repository: ${STANDARDS_REPO_URL}${NC}"
+    echo -e "${YELLOW}   (Set STANDARDS_REPO_URL env var to use a different repository)${NC}"
 fi
 
 # Add as git submodule

@@ -20,7 +20,7 @@ Best for teams sharing standards across multiple projects.
 
 ```bash
 # In your project root
-git submodule add <standards-repo-url> .standards
+git submodule add https://github.com/c65llc/coding_standards.git .standards
 git submodule update --init --recursive
 ```
 
@@ -50,7 +50,7 @@ Best for individual projects or when you want full control.
 #### Step 1: Clone Standards Repository
 
 ```bash
-git clone <standards-repo-url> .standards
+git clone https://github.com/c65llc/coding_standards.git .standards
 ```
 
 #### Step 2: Copy .cursorrules

@@ -8,12 +8,12 @@ Get up and running with project standards in 5 minutes.
 
 **Option A: Clone this repository**
 ```bash
-git clone <standards-repo-url> .standards
+git clone https://github.com/c65llc/coding_standards.git .standards
 ```
 
 **Option B: Add as submodule (recommended for teams)**
 ```bash
-git submodule add <standards-repo-url> .standards
+git submodule add https://github.com/c65llc/coding_standards.git .standards
 ```
 
 ### Step 2: Setup

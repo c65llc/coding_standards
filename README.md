@@ -7,24 +7,15 @@ Comprehensive development standards and guidelines for software projects, design
 **Install standards in your project with one command:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/install.sh | bash
-```
-
-**Example:**
-
-```bash
-# If your repo is at github.com/acme-corp/project-standards
-curl -fsSL https://raw.githubusercontent.com/acme-corp/project-standards/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/c65llc/coding_standards/main/install.sh | bash
 ```
 
 **Or specify a custom repository URL:**
 
 ```bash
-STANDARDS_REPO_URL="https://github.com/your-org/project-standards" \
-  curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/install.sh | bash
+STANDARDS_REPO_URL="https://github.com/c65llc/coding_standards" \
+  curl -fsSL https://raw.githubusercontent.com/c65llc/coding_standards/main/install.sh | bash
 ```
-
-> **Note:** Replace `YOUR_USERNAME` and `YOUR_REPO` with your actual GitHub username and repository name. The installer will prompt for the repository URL if not provided.
 
 The installer will:
 
@@ -86,14 +77,14 @@ If you prefer manual setup or the installer doesn't work:
 
 ```bash
 # In your project root
-git submodule add <repository-url> .standards
+git submodule add https://github.com/c65llc/coding_standards.git .standards
 .standards/scripts/setup.sh
 ```
 
 ### Option 2: Direct Clone
 
 ```bash
-git clone <repository-url> .standards
+git clone https://github.com/c65llc/coding_standards.git .standards
 .standards/scripts/setup.sh
 ```
 

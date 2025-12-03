@@ -14,7 +14,7 @@ This repository contains comprehensive standards and guidelines for software dev
 
 1. **Clone as submodule** in your projects:
    ```bash
-   git submodule add <repository-url> .standards
+   git submodule add https://github.com/c65llc/coding_standards.git .standards
    ```
 
 2. **Symlink `.cursorrules`** to your project:
@@ -73,7 +73,7 @@ Copy `.cursorrules` to your project root. Cursor will automatically use it.
 
 1. Add as submodule:
    ```bash
-   git submodule add <repository-url> .standards
+   git submodule add https://github.com/c65llc/coding_standards.git .standards
    ```
 
 2. Create `.cursorrules` in your project:

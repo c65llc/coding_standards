@@ -81,7 +81,7 @@ git push origin main --tags
 
 ```bash
 # 1. Add as submodule
-git submodule add <standards-repo-url> .standards
+git submodule add https://github.com/c65llc/coding_standards.git .standards
 
 # 2. Setup
 .standards/setup.sh
@@ -239,7 +239,7 @@ git push -u origin main --tags
 
 ```bash
 # In your project
-git submodule add <standards-repo-url> .standards
+git submodule add https://github.com/c65llc/coding_standards.git .standards
 .standards/setup.sh
 # Restart Cursor
 ```

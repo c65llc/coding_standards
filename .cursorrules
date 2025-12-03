@@ -99,6 +99,7 @@ When the user types `\pr` in chat, you MUST:
 1. **Gather PR Information:**
    - Run the PR content generation script: `./scripts/generate-pr-content.sh` (or `.standards/scripts/generate-pr-content.sh` if using submodule)
    - Read the generated PR content file (path is output by the script)
+   - The file will be created in `.standards_tmp/` directory (which should be in `.gitignore`)
    - Analyze the commits, changed files, and code diff from the file
 
 2. **Generate PR Content with AI:**
@@ -121,4 +122,16 @@ When the user types `\pr` in chat, you MUST:
    - Display the PR URL after creation
    - Show any errors if PR creation fails
    - Confirm successful PR creation
+
+## Temporary Files
+
+All temporary files created by Cursor AI commands or scripts from the standards repository MUST be placed in the `.standards_tmp/` directory at the project root. This ensures:
+- Easy cleanup (can be added to `.gitignore` as `.standards_tmp/`)
+- Clear separation of standards-related temp files
+- No pollution of project directories with temporary files
+
+When creating temporary files:
+- Use `.standards_tmp/` as the base directory
+- Create the directory if it doesn't exist: `mkdir -p .standards_tmp`
+- Use descriptive filenames with timestamps or process IDs to avoid conflicts
 

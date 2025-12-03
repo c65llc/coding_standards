@@ -12,8 +12,15 @@ if [ "$CURRENT_BRANCH" = "$BASE_BRANCH" ]; then
     exit 1
 fi
 
-# Create temporary file for PR content
-PR_CONTENT_FILE=$(mktemp /tmp/pr-content-XXXXXX.txt)
+# Determine project root (git root or current directory)
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+
+# Create .standards_tmp directory if it doesn't exist
+STANDARDS_TMP_DIR="$PROJECT_ROOT/.standards_tmp"
+mkdir -p "$STANDARDS_TMP_DIR"
+
+# Create temporary file for PR content in .standards_tmp
+PR_CONTENT_FILE="$STANDARDS_TMP_DIR/pr-content-$(date +%s)-$$.txt"
 trap "rm -f $PR_CONTENT_FILE" EXIT
 
 # Gather commit information

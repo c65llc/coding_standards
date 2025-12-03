@@ -75,6 +75,7 @@ Every project MUST include the following targets in the root `Makefile`:
 * **Help:** Include a `help` target that lists commands and descriptions (default target).
 * **List Targets:** Include an `ls` target that lists all available make targets without descriptions for quick reference.
 * **Idempotency:** Commands should be safe to run multiple times without side effects.
+* **Temporary Files:** All temporary files created by standards-related scripts or Cursor AI commands MUST be placed in `.standards_tmp/` directory at the project root. This directory should be added to `.gitignore` in all projects using the standards (automatically handled by setup scripts).
 
 ### Implementation Example for `make ls`
 

@@ -63,6 +63,22 @@ else
     echo "⚠️  Please restart Cursor to load rules"
 fi
 
+# Update Cursor custom commands if they exist
+if [ -d "$STANDARDS_DIR/.cursor/commands" ]; then
+    CURSOR_COMMANDS_SOURCE="$STANDARDS_DIR/.cursor/commands"
+elif [ -d "$SCRIPT_DIR/../.cursor/commands" ]; then
+    CURSOR_COMMANDS_SOURCE="$SCRIPT_DIR/../.cursor/commands"
+else
+    CURSOR_COMMANDS_SOURCE=""
+fi
+
+if [ -n "$CURSOR_COMMANDS_SOURCE" ] && [ -d "$CURSOR_COMMANDS_SOURCE" ]; then
+    echo "📝 Syncing Cursor custom commands..."
+    mkdir -p "$PROJECT_ROOT/.cursor/commands"
+    cp -r "$CURSOR_COMMANDS_SOURCE"/* "$PROJECT_ROOT/.cursor/commands/" 2>/dev/null || true
+    echo "✅ Cursor commands synced"
+fi
+
 # Check for new standards files
 if [ -d "$STANDARDS_DIR" ] || [ "$SCRIPT_DIR" = "$PROJECT_ROOT" ]; then
     STANDARDS_FILES_DIR="${STANDARDS_DIR:-$SCRIPT_DIR/..}"

@@ -160,6 +160,26 @@ MAKEFILE
     echo -e "${GREEN}✅ Created Makefile with standards targets${NC}"
 fi
 
+# Add .standards_tmp/ to .gitignore if needed
+echo -e "${BLUE}📝 Updating .gitignore...${NC}"
+if [ -f "$PROJECT_ROOT/.gitignore" ]; then
+    if ! grep -q ".standards_tmp" "$PROJECT_ROOT/.gitignore" 2>/dev/null; then
+        echo "" >> "$PROJECT_ROOT/.gitignore"
+        echo "# Standards temporary files" >> "$PROJECT_ROOT/.gitignore"
+        echo ".standards_tmp/" >> "$PROJECT_ROOT/.gitignore"
+        echo -e "${GREEN}✅ Added .standards_tmp/ to .gitignore${NC}"
+    else
+        echo -e "${YELLOW}⚠️  .standards_tmp/ already in .gitignore${NC}"
+    fi
+else
+    # Create .gitignore with .standards_tmp/
+    cat > "$PROJECT_ROOT/.gitignore" << 'GITIGNORE'
+# Standards temporary files
+.standards_tmp/
+GITIGNORE
+    echo -e "${GREEN}✅ Created .gitignore with .standards_tmp/${NC}"
+fi
+
 # Summary
 echo ""
 echo -e "${GREEN}✅ Installation complete!${NC}"

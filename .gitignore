@@ -1,0 +1,19 @@
+# Backup files
+.cursorrules.backup
+*.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files (if not shared)
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.log
+

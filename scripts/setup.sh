@@ -11,7 +11,7 @@ setup_ai_agents() {
     local STANDARDS_DIR="$1"
     local SCRIPT_DIR="$2"
     local PROJECT_ROOT="$3"
-    
+
     local AGENTS_DIR=""
     if [ -d "$STANDARDS_DIR/standards/agents" ]; then
         AGENTS_DIR="$STANDARDS_DIR/standards/agents"
@@ -21,7 +21,7 @@ setup_ai_agents() {
         echo "⚠️  No agent configurations found (standards/agents directory missing)"
         return
     fi
-    
+
     # Setup GitHub Copilot
     if [ -f "$AGENTS_DIR/copilot/.github/copilot-instructions.md" ]; then
         echo "📝 Setting up GitHub Copilot..."
@@ -32,7 +32,7 @@ setup_ai_agents() {
             echo "⚠️  Failed to install Copilot instructions (non-fatal, continuing...)"
         fi
     fi
-    
+
     # Setup Aider (Claude Code)
     if [ -f "$AGENTS_DIR/aider/.aiderrc" ]; then
         echo "📝 Setting up Aider (Claude Code)..."
@@ -42,7 +42,7 @@ setup_ai_agents() {
             echo "⚠️  Failed to install Aider config (non-fatal, continuing...)"
         fi
     fi
-    
+
     # Setup OpenAI Codex
     if [ -f "$AGENTS_DIR/codex/.codexrc" ]; then
         echo "📝 Setting up OpenAI Codex..."
@@ -145,7 +145,7 @@ if [ "$SCRIPT_DIR" = "$PROJECT_ROOT" ]; then
 else
     # We're in a project using standards
     STANDARDS_DIR="$PROJECT_ROOT/.standards"
-    
+
     if [ -d "$STANDARDS_DIR" ]; then
         echo "📋 Found standards submodule at .standards"
         CURSORRULES_SOURCE="$STANDARDS_DIR/.cursorrules"
@@ -156,7 +156,7 @@ else
         echo "❌ Error: Could not find .cursorrules"
         exit 1
     fi
-    
+
     # Create symlink or copy .cursorrules
     if [ -L "$PROJECT_ROOT/.cursorrules" ]; then
         echo "🔗 .cursorrules is already a symlink"
@@ -165,7 +165,7 @@ else
         cp "$CURSORRULES_SOURCE" "$PROJECT_ROOT/.cursorrules"
         echo "✅ .cursorrules created"
     fi
-    
+
     # Copy Cursor custom commands if they exist
     if [ -d "$STANDARDS_DIR/.cursor/commands" ]; then
         CURSOR_COMMANDS_SOURCE="$STANDARDS_DIR/.cursor/commands"
@@ -174,7 +174,7 @@ else
     else
         CURSOR_COMMANDS_SOURCE=""
     fi
-    
+
     if [ -n "$CURSOR_COMMANDS_SOURCE" ] && [ -d "$CURSOR_COMMANDS_SOURCE" ]; then
         echo "📝 Setting up Cursor custom commands..."
         mkdir -p "$PROJECT_ROOT/.cursor/commands"
@@ -185,7 +185,7 @@ else
             echo "⚠️  Failed to install Cursor commands (non-fatal, continuing...)"
         fi
     fi
-    
+
     # Setup multi-agent configurations
     echo ""
     echo "🤖 Setting up AI agent configurations..."
@@ -210,13 +210,13 @@ if [ -d ".standards" ]; then
     git fetch origin >/dev/null 2>&1
     LOCAL=$(git rev-parse HEAD)
     REMOTE=$(git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null)
-    
+
     if [ "$LOCAL" != "$REMOTE" ] && [ -n "$REMOTE" ]; then
         echo "📋 Standards repository has updates. Run: cd .standards && git pull"
     fi
 fi
 HOOK
-    
+
     chmod +x "$GIT_HOOKS_DIR/post-merge"
     echo "✅ Git hooks installed"
 fi
@@ -237,7 +237,7 @@ if command -v git >/dev/null 2>&1; then
             GIT_ALIASES_SCRIPT=""
         fi
     fi
-    
+
     if [ -n "$GIT_ALIASES_SCRIPT" ] && [ -f "$GIT_ALIASES_SCRIPT" ]; then
         echo ""
         echo "🔧 Setting up git aliases and configuration..."
@@ -311,4 +311,3 @@ echo "6. If using Gemini CLI, it will automatically use .gemini/GEMINI.md and .g
 echo "7. If using submodule, ensure it's initialized: git submodule update --init"
 echo "8. To sync standards later, run: ./sync-standards.sh (or cd .standards && git pull)"
 echo "   Note: After syncing, fully restart your IDE again to load updated configurations"
-

@@ -35,12 +35,52 @@ The installer will:
 
 ---
 
+## 🔧 GitHub Project Lifecycle Automation
+
+**NEW**: Seamless CLI-driven workflow connecting issues to Draft PRs via GitHub Projects V2.
+
+```bash
+# Install gh-task CLI tool
+ln -s .standards/bin/gh-task bin/gh-task
+
+# Create and start working on an issue
+gh-task create "Add user authentication"
+gh-task start 42
+
+# Submit when ready (runs tests, creates Draft PR)
+gh-task submit
+```
+
+**Features:**
+- ✅ Automatic GitHub Projects V2 status updates
+- ✅ Branch management with naming conventions  
+- ✅ Pre-flight test validation
+- ✅ Draft PR creation with issue linking
+- ✅ AI agent and human developer support
+
+**Documentation:**
+- [gh-task CLI Guide](docs/GH_TASK_GUIDE.md) - Complete command reference
+- [Tooling Guide](docs/TOOLING.md) - Architecture and AI agent instructions
+- [Reusable GitHub Actions Workflows](.github/workflows/) - CI/CD automation
+
+---
+
 ## 📁 Repository Structure
 
 ```text
 .
 ├── .cursorrules                    # Cursor AI configuration (references all standards)
 ├── Makefile                        # Automation targets
+│
+├── bin/                            # CLI utilities
+│   └── gh-task                    # GitHub Project lifecycle management CLI
+│
+├── .github/                        # GitHub configuration
+│   ├── workflows/                 # Reusable GitHub Actions workflows
+│   │   ├── lifecycle-sync.yml    # Auto-sync Project V2 status on PR events
+│   │   └── definition-of-done.yml # Quality checks for PRs
+│   └── PULL_REQUEST_TEMPLATE/    # PR templates with issue linking
+│       └── default.md
 │
 ├── standards/                      # All standards documents
 │   ├── architecture/              # Core architecture & automation
@@ -66,11 +106,18 @@ The installer will:
 │   ├── setup.sh                  # Setup standards in a project
 │   └── sync-standards.sh         # Sync standards updates
 │
+├── templates/                      # Configuration templates
+│   ├── settings.json.example     # GitHub Projects V2 config template
+│   └── gh-task.conf.example      # Alternative gh-task config template
+│
 └── docs/                          # Documentation
-    ├── README.md                 # Detailed overview (this file)
+    ├── README.md                 # Detailed overview
     ├── QUICK_START.md            # 5-minute setup guide
     ├── SETUP_GUIDE.md            # Detailed setup instructions
-    └── INTEGRATION_GUIDE.md       # Complete integration guide
+    ├── INTEGRATION_GUIDE.md       # Complete integration guide
+    ├── MULTI_AGENT_GUIDE.md      # Multi-agent AI support guide
+    ├── GH_TASK_GUIDE.md          # gh-task CLI complete reference
+    └── TOOLING.md                # GitHub Project lifecycle automation guide
 ```
 
 ## 📖 Manual Installation

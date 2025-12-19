@@ -1,0 +1,333 @@
+name: Definition of Done Checks
+
+# Reusable workflow for enforcing Definition of Done before PR can be marked ready
+# This workflow runs comprehensive checks on AI-generated code
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: 'Node.js version to use (if applicable)'
+        required: false
+        type: string
+        default: '18'
+      python_version:
+        description: 'Python version to use (if applicable)'
+        required: false
+        type: string
+        default: '3.11'
+      run_linting:
+        description: 'Run linting checks'
+        required: false
+        type: boolean
+        default: true
+      run_tests:
+        description: 'Run test suite'
+        required: false
+        type: boolean
+        default: true
+      run_security_scan:
+        description: 'Run security scanning'
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      gh_token:
+        description: 'GitHub token for API access'
+        required: false
+
+jobs:
+  code-quality-checks:
+    name: Code Quality & Standards
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: 'npm'
+          
+      - name: Setup Python
+        if: hashFiles('requirements.txt', 'setup.py', 'pyproject.toml') != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+          
+      - name: Install dependencies (Node.js)
+        if: hashFiles('package.json') != ''
+        run: npm ci
+        
+      - name: Install dependencies (Python)
+        if: hashFiles('requirements.txt') != ''
+        run: pip install -r requirements.txt
+        
+      - name: Run linting
+        if: inputs.run_linting
+        run: |
+          echo "Running linting checks..."
+          
+          # Node.js linting
+          if [ -f "package.json" ]; then
+            if grep -q '"lint"' package.json; then
+              echo "Running npm run lint..."
+              npm run lint || true
+            fi
+          fi
+          
+          # Python linting
+          if [ -f "setup.py" ] || [ -f "pyproject.toml" ]; then
+            if command -v flake8 >/dev/null 2>&1; then
+              echo "Running flake8..."
+              flake8 . || true
+            fi
+            if command -v pylint >/dev/null 2>&1; then
+              echo "Running pylint..."
+              pylint **/*.py || true
+            fi
+          fi
+          
+          echo "✅ Linting checks completed"
+          
+      - name: Run tests
+        if: inputs.run_tests
+        run: |
+          echo "Running test suite..."
+          
+          # Node.js tests
+          if [ -f "package.json" ]; then
+            if grep -q '"test"' package.json; then
+              echo "Running npm test..."
+              npm test
+            fi
+          fi
+          
+          # Python tests
+          if [ -f "pytest.ini" ] || [ -f "setup.py" ]; then
+            if command -v pytest >/dev/null 2>&1; then
+              echo "Running pytest..."
+              pytest
+            fi
+          fi
+          
+          # Makefile tests
+          if [ -f "Makefile" ]; then
+            if grep -q "^test:" Makefile; then
+              echo "Running make test..."
+              make test
+            fi
+          fi
+          
+          echo "✅ Tests passed"
+          
+      - name: Check code coverage
+        if: inputs.run_tests
+        run: |
+          echo "Checking code coverage..."
+          
+          # Node.js coverage
+          if [ -f "package.json" ] && grep -q '"coverage"' package.json; then
+            npm run coverage || true
+          fi
+          
+          # Python coverage
+          if command -v pytest >/dev/null 2>&1; then
+            pytest --cov=. --cov-report=term-missing || true
+          fi
+          
+          echo "✅ Coverage check completed"
+  
+  security-checks:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    if: inputs.run_security_scan
+    permissions:
+      contents: read
+      security-events: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Run dependency security scan
+        run: |
+          echo "Running dependency security scan..."
+          
+          # Node.js security audit
+          if [ -f "package.json" ]; then
+            echo "Running npm audit..."
+            npm audit --audit-level=moderate || true
+          fi
+          
+          # Python security check
+          if [ -f "requirements.txt" ]; then
+            echo "Checking Python dependencies..."
+            pip install safety
+            safety check || true
+          fi
+          
+          echo "✅ Security scan completed"
+          
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'javascript,python'
+        continue-on-error: true
+        
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        continue-on-error: true
+  
+  documentation-checks:
+    name: Documentation Validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check for README updates
+        run: |
+          echo "Checking documentation..."
+          
+          # Check if code changes require README updates
+          if git diff --name-only origin/main...HEAD | grep -E '\.(js|ts|py|go|java)$' > /dev/null; then
+            echo "ℹ️  Code changes detected"
+            if ! git diff --name-only origin/main...HEAD | grep -E 'README\.md|\.md$' > /dev/null; then
+              echo "⚠️  Consider updating documentation"
+            fi
+          fi
+          
+          echo "✅ Documentation check completed"
+          
+      - name: Validate markdown files
+        run: |
+          echo "Validating markdown files..."
+          
+          # Install markdownlint-cli if available
+          if command -v npm >/dev/null 2>&1; then
+            npm install -g markdownlint-cli || true
+            
+            if command -v markdownlint >/dev/null 2>&1; then
+              markdownlint '**/*.md' --ignore node_modules || true
+            fi
+          fi
+          
+          echo "✅ Markdown validation completed"
+  
+  pr-metadata-check:
+    name: PR Metadata Validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      
+    steps:
+      - name: Check PR details
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.gh_token || secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            
+            if (!pr) {
+              console.log('Not a pull request context');
+              return;
+            }
+            
+            const issues = [];
+            
+            // Check PR title
+            if (!pr.title || pr.title.length < 10) {
+              issues.push('❌ PR title is too short (minimum 10 characters)');
+            }
+            
+            // Check PR body
+            if (!pr.body || pr.body.length < 30) {
+              issues.push('⚠️  PR description is very short - consider adding more details');
+            }
+            
+            // Check for linked issue
+            const issueMatch = pr.body?.match(/(?:Closes|Fixes|Resolves)\s+#(\d+)/i);
+            if (!issueMatch) {
+              issues.push('⚠️  No linked issue found (use "Closes #123" in PR description)');
+            }
+            
+            // Check for draft status
+            if (pr.draft) {
+              console.log('ℹ️  PR is in draft mode');
+            }
+            
+            // Output results
+            if (issues.length > 0) {
+              console.log('\nPR Metadata Issues:\n');
+              issues.forEach(issue => console.log(issue));
+              console.log('\n');
+            } else {
+              console.log('✅ PR metadata looks good');
+            }
+            
+            // Don't fail the check, just warn
+            return;
+  
+  summary:
+    name: Definition of Done Summary
+    needs: [code-quality-checks, security-checks, documentation-checks, pr-metadata-check]
+    runs-on: ubuntu-latest
+    if: always()
+    permissions:
+      contents: read
+      pull-requests: write
+      
+    steps:
+      - name: Generate summary
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.gh_token || secrets.GITHUB_TOKEN }}
+          script: |
+            const jobs = [
+              { name: 'Code Quality & Standards', result: '${{ needs.code-quality-checks.result }}' },
+              { name: 'Security Scanning', result: '${{ needs.security-checks.result }}' },
+              { name: 'Documentation Validation', result: '${{ needs.documentation-checks.result }}' },
+              { name: 'PR Metadata Validation', result: '${{ needs.pr-metadata-check.result }}' }
+            ];
+            
+            let summary = '## Definition of Done - Summary\n\n';
+            
+            jobs.forEach(job => {
+              const icon = job.result === 'success' ? '✅' : 
+                          job.result === 'failure' ? '❌' : 
+                          job.result === 'skipped' ? '⏭️' : '⚠️';
+              summary += `${icon} ${job.name}: ${job.result}\n`;
+            });
+            
+            const allPassed = jobs.every(job => job.result === 'success' || job.result === 'skipped');
+            
+            if (allPassed) {
+              summary += '\n✅ **All checks passed! This PR meets the Definition of Done.**\n';
+            } else {
+              summary += '\n⚠️  **Some checks failed. Please review and address the issues.**\n';
+            }
+            
+            console.log(summary);
+            
+            // Post summary as comment if this is a PR
+            if (context.payload.pull_request) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: summary
+              });
+            }

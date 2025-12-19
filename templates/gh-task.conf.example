@@ -1,0 +1,14 @@
+# gh-task configuration file
+# Alternative to .gemini/settings.json for projects not using Gemini
+
+# GitHub Projects V2 ID
+# Find this in your project URL or by running: gh project list --owner <org>
+PROJECT_ID="PVT_kwDOABCDEF"
+
+# Status field ID (optional - will auto-detect if not provided)
+# Get this from your project field settings if auto-detection fails
+STATUS_FIELD_ID="PVTSSF_lADOABCDEF"
+
+# Repository information (optional - auto-detected from git)
+# REPO_OWNER="your-org"
+# REPO_NAME="your-repo"

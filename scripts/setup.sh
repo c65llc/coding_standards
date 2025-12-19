@@ -52,6 +52,34 @@ setup_ai_agents() {
             echo "⚠️  Failed to install Codex config (non-fatal, continuing...)"
         fi
     fi
+    
+    # Setup Gemini CLI & Antigravity
+    if [ -d "$STANDARDS_DIR/.gemini" ]; then
+        GEMINI_SOURCE="$STANDARDS_DIR/.gemini"
+    elif [ -d "$SCRIPT_DIR/../.gemini" ]; then
+        GEMINI_SOURCE="$SCRIPT_DIR/../.gemini"
+    else
+        GEMINI_SOURCE=""
+    fi
+    
+    if [ -n "$GEMINI_SOURCE" ] && [ -d "$GEMINI_SOURCE" ]; then
+        echo "📝 Setting up Gemini CLI & Antigravity..."
+        mkdir -p "$PROJECT_ROOT/.gemini"
+        if [ -f "$GEMINI_SOURCE/GEMINI.md" ]; then
+            if cp "$GEMINI_SOURCE/GEMINI.md" "$PROJECT_ROOT/.gemini/GEMINI.md" 2>/dev/null; then
+                echo "✅ Gemini configuration installed at .gemini/GEMINI.md"
+            else
+                echo "⚠️  Failed to install Gemini config (non-fatal, continuing...)"
+            fi
+        fi
+        if [ -f "$GEMINI_SOURCE/settings.json" ]; then
+            if cp "$GEMINI_SOURCE/settings.json" "$PROJECT_ROOT/.gemini/settings.json" 2>/dev/null; then
+                echo "✅ Gemini CLI settings installed at .gemini/settings.json"
+            else
+                echo "⚠️  Failed to install Gemini settings (non-fatal, continuing...)"
+            fi
+        fi
+    fi
 }
 
 echo "🔧 Setting up project standards..."
@@ -208,7 +236,8 @@ echo "1. Fully quit and restart Cursor to load .cursorrules and custom commands"
 echo "2. If using GitHub Copilot, restart your IDE to load .github/copilot-instructions.md"
 echo "3. If using Aider, it will automatically use .aiderrc"
 echo "4. If using Codex, ensure your IDE reads .codexrc"
-echo "5. If using submodule, ensure it's initialized: git submodule update --init"
-echo "6. To sync standards later, run: ./sync-standards.sh (or cd .standards && git pull)"
+echo "5. If using Gemini CLI, it will automatically use .gemini/GEMINI.md and .gemini/settings.json"
+echo "6. If using submodule, ensure it's initialized: git submodule update --init"
+echo "7. To sync standards later, run: ./sync-standards.sh (or cd .standards && git pull)"
 echo "   Note: After syncing, fully restart your IDE again to load updated configurations"
 

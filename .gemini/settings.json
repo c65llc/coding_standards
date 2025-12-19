@@ -1,0 +1,13 @@
+{
+  "checkpointing": true,
+  "terminalPolicy": "auto",
+  "defaultModel": "gemini-1.5-pro",
+  "mcpServers": {
+    "gcp-tooling": {
+      "command": "gcloud",
+      "args": ["components", "mcp-server"],
+      "trust": true
+    }
+  }
+}
+

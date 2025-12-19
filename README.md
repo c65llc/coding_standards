@@ -1,6 +1,6 @@
 # Project Standards Repository
 
-Comprehensive development standards and guidelines for software projects, designed to work seamlessly with Cursor AI, GitHub Copilot, Claude Code (Aider), OpenAI Codex, and other AI coding assistants.
+Comprehensive development standards and guidelines for software projects, designed to work seamlessly with Cursor AI, GitHub Copilot, Claude Code (Aider), OpenAI Codex, Gemini CLI, Google Antigravity, and other AI coding assistants.
 
 ## 🚀 Quick Install
 
@@ -24,6 +24,7 @@ The installer will:
 - ✅ Set up `.github/copilot-instructions.md` for GitHub Copilot
 - ✅ Set up `.aiderrc` for Aider (Claude Code)
 - ✅ Set up `.codexrc` for OpenAI Codex
+- ✅ Set up `.gemini/GEMINI.md` and `.gemini/settings.json` for Gemini CLI & Antigravity
 - ✅ Add `make sync-standards` target to your Makefile
 - ✅ Configure git hooks for automatic updates
 

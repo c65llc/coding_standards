@@ -18,6 +18,9 @@ Thumbs.db
 !.cursor/commands/
 !.cursor/commands/**
 
+# Gemini CLI files (but track .gemini/ config files)
+.gemini/active_mission.log
+
 # Temporary files
 *.tmp
 *.temp

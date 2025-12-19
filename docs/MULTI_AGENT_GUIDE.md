@@ -30,6 +30,15 @@ This repository supports multiple AI coding assistants to ensure all team member
 - **Setup**: Automatically configured by `make setup` or `./scripts/setup.sh`
 - **Usage**: Depends on your IDE's Codex integration
 
+### 5. Gemini CLI & Google Antigravity
+- **Configuration File**: `.gemini/GEMINI.md` (primary), `.gemini/settings.json`
+- **Location**: `.gemini/` directory in project root
+- **Setup**: Automatically configured by `make setup` or `./scripts/setup.sh`
+- **Usage**: 
+  - **Gemini CLI**: Reads `.gemini/GEMINI.md` as primary context and `.gemini/settings.json` for CLI settings
+  - **Antigravity**: Uses `.gemini/GEMINI.md` for mission context, `.gemini/active_mission.log` for cross-agent synchronization
+- **Restart Required**: No (configuration is read on each command)
+
 ## Setup
 
 ### Initial Setup
@@ -50,6 +59,7 @@ This will create:
 - `.github/copilot-instructions.md` for GitHub Copilot
 - `.aiderrc` for Aider (Claude Code)
 - `.codexrc` for OpenAI Codex
+- `.gemini/GEMINI.md` and `.gemini/settings.json` for Gemini CLI & Antigravity
 
 ### Updating Agent Configurations
 
@@ -165,6 +175,64 @@ Codex uses `.codexrc` for configuration. This file:
 - Depends on your IDE's Codex integration
 - Check your IDE's documentation for Codex support
 
+### Gemini CLI & Google Antigravity
+
+Gemini CLI and Google Antigravity use `.gemini/GEMINI.md` as the primary source of truth for AI agents. This file acts as the "system prompt" for the entire repository.
+
+**Configuration Files:**
+- `.gemini/GEMINI.md` - Repository intelligence and standards (primary context)
+- `.gemini/settings.json` - Gemini CLI settings (checkpointing, model, MCP servers)
+- `.gemini/active_mission.log` - Active Antigravity mission URL (gitignored, for cross-agent sync)
+
+**Gemini CLI Workflow:**
+Agents using Gemini CLI should follow the A-P-E (Analyze, Plan, Execute) cycle:
+
+1. **Analyze**: Run `gemini -p "Identify dependencies in [filename]"`
+2. **Plan**: Generate a plan before writing code: `/plan "Add OAuth2 flow"`
+3. **Execute**: Use `gemini edit` to provide a diff for human review rather than overwriting files blindly
+
+**Antigravity Integration:**
+- **Mission Isolation**: Each major feature should be handled in a separate Antigravity Mission
+- **Context Sharing**: Copy the URL of the current Mission into `.gemini/active_mission.log` to allow cross-agent synchronization
+- **MCP Integration**: 
+  - Enable Google Cloud MCP to allow agents to see live resource IDs
+  - Enable Postgres/SQL MCP for real-time schema validation during migrations
+- **Browser Agent Validation**: For UI-related code, agents should:
+  - Spin up a local dev server
+  - Use the Antigravity Browser Agent to take a screenshot of the change
+  - Compare the screenshot against design requirements in `/assets/designs`
+
+**After Setup:**
+1. Install Gemini CLI: Follow [Gemini CLI installation guide](https://ai.google.dev/gemini-api/docs/cli)
+2. Configure MCP servers (optional): Set up Google Cloud and Postgres MCP servers if needed
+3. Start using: Run `gemini` commands in the project directory
+4. For Antigravity: Create missions and reference `.gemini/GEMINI.md` for context
+
+**Agent Onboarding Prompt:**
+When starting a new AI agent session, paste this prompt:
+
+```
+I am working in a codebase optimized for Gemini CLI and Google Antigravity.
+
+Start by reading .gemini/GEMINI.md to understand our architecture and constraints.
+
+Use checkpointing via Gemini CLI before attempting any refactors.
+
+If you need to verify UI changes, use the Antigravity Browser tool.
+
+Do not proceed with multi-file edits without first outputting a 'Proposed Logic Plan'.
+```
+
+**Verification:**
+- Check that `.gemini/GEMINI.md` exists and contains repository standards
+- Check that `.gemini/settings.json` exists with proper configuration
+- Run `gemini -p "What are the project standards?"` and verify it references `.gemini/GEMINI.md`
+- For Antigravity: Verify missions can access repository context
+
+**References:**
+- [Gemini API Documentation](https://ai.google.dev/gemini-api/docs)
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
+
 ## Standards Source
 
 All agent configurations reference the same standards documents:
@@ -182,7 +250,7 @@ This ensures consistency across all AI agents.
 
 1. **Verify files exist:**
    ```bash
-   ls -la .cursorrules .github/copilot-instructions.md .aiderrc .codexrc
+   ls -la .cursorrules .github/copilot-instructions.md .aiderrc .codexrc .gemini/GEMINI.md .gemini/settings.json
    ```
 
 2. **Re-run setup:**
@@ -207,6 +275,14 @@ This ensures consistency across all AI agents.
 1. **Check file location**: Ensure `.aiderrc` is in project root
 2. **Verify syntax**: Check that `.aiderrc` has valid syntax
 3. **Run from project root**: Always run `aider` from the project root directory
+
+### Gemini CLI Not Reading Config
+
+1. **Check file location**: Ensure `.gemini/GEMINI.md` exists in project root
+2. **Verify file content**: Check that `.gemini/GEMINI.md` contains repository standards
+3. **Check settings**: Verify `.gemini/settings.json` has valid JSON syntax
+4. **Run from project root**: Always run `gemini` commands from the project root directory
+5. **MCP servers**: If using MCP, verify servers are properly configured and running
 
 ## Collaboration
 

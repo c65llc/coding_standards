@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Multi-agent support for GitHub Copilot, Aider (Claude Code), and OpenAI Codex
+- Multi-agent support for GitHub Copilot, Aider (Claude Code), OpenAI Codex, Gemini CLI, and Google Antigravity
 - `.github/copilot-instructions.md` for GitHub Copilot configuration
 - `.aiderrc` for Aider (Claude Code) configuration
 - `.codexrc` for OpenAI Codex configuration
+- `.gemini/GEMINI.md` for Gemini CLI and Antigravity repository intelligence
+- `.gemini/settings.json` for Gemini CLI configuration (checkpointing, model, MCP servers)
 - `standards/shared/core-standards.md` - Shared core standards for all agents
 - `standards/agents/` directory structure for agent-specific configurations
 - `make setup-agents` target for setting up AI agent configurations
@@ -20,11 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated setup and sync scripts to automatically configure all supported agents
 
 ### Changed
-- Updated `scripts/setup.sh` to detect and configure multiple AI agents
-- Updated `scripts/sync-standards.sh` to sync all agent configurations
+- Updated `scripts/setup.sh` to detect and configure multiple AI agents (including Gemini CLI and Antigravity)
+- Updated `scripts/sync-standards.sh` to sync all agent configurations (including Gemini CLI and Antigravity)
 - Updated `install.sh` to show which agent configurations were installed
-- Updated `README.md` to mention multi-agent support
+- Updated `README.md` to mention multi-agent support (including Gemini CLI and Antigravity)
+- Updated `docs/MULTI_AGENT_GUIDE.md` to include Gemini CLI and Antigravity setup and usage instructions
 - Updated `STRUCTURE.md` to include new agent directories
+- Updated `.gitignore` to exclude `.gemini/active_mission.log` (Antigravity mission tracking)
 
 ### Improved
 - Better collaboration support for non-Cursor users

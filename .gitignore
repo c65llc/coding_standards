@@ -36,3 +36,7 @@ standards-sync-*.tmp
 # Git submodule tracking (when this repo is used as submodule in other projects)
 .gitmodules.local
 
+# gh-task CLI state files
+.gh-task-state
+.gh-task.conf
+

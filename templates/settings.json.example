@@ -1,0 +1,10 @@
+{
+  "project_id": "PVT_kwDOABCDEF",
+  "status_field_id": "PVTSSF_lADOABCDEF",
+  "description": "GitHub Projects V2 configuration for gh-task CLI",
+  "notes": {
+    "project_id": "Find this in your project URL or by running: gh project list --owner <org>",
+    "status_field_id": "Optional - will auto-detect if not provided. Get from project field settings.",
+    "setup_instructions": "Copy this file to .gemini/settings.json in your project and update the IDs"
+  }
+}

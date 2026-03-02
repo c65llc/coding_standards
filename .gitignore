@@ -27,9 +27,17 @@ Thumbs.db
 # Node.js
 node_modules/
 
-# Astro
+# Website build artifacts
 website/dist/
 website/.astro/
+website/node_modules/
+
+# Synced content (generated at build time by scripts/sync-content.sh)
+website/src/content/docs/getting-started/
+website/src/content/docs/guides/
+website/src/content/docs/reference/
+website/src/content/docs/standards/
+website/src/content/docs/changelog.md
 
 # Temporary files
 *.tmp

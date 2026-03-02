@@ -41,6 +41,7 @@ Python, Java, Kotlin, Swift, Dart, TypeScript, JavaScript, Rust, Zig
 - **Clean Architecture** -- Enforces domain-driven design across all languages.
 - **One-Command Setup** -- Install everything with a single command.
 - **Auto-Updating** -- Git hooks keep standards in sync whenever you pull.
+- **GitHub Project Lifecycle** -- CLI-driven workflow connecting issues to Draft PRs via GitHub Projects V2.
 
 ## Documentation
 

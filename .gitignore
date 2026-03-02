@@ -44,6 +44,9 @@ website/src/content/docs/changelog.md
 *.temp
 *.log
 
+# Test coverage output (vitest, jest, pytest, etc.)
+coverage/
+
 # Standards temporary files directory (used by Cursor AI commands and scripts)
 .standards_tmp/
 
@@ -56,4 +59,8 @@ standards-sync-*.tmp
 
 # Git submodule tracking (when this repo is used as submodule in other projects)
 .gitmodules.local
+
+# gh-task CLI state files
+.gh-task-state
+.gh-task.conf
 

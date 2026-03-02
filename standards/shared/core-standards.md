@@ -69,22 +69,53 @@ Strict adherence required. Violations must be justified in code comments.
 ### Type Safety
 
 - **TypeScript:** Strict mode enabled. No `any` without explicit justification.
-- **Python:** Type hints required for all public APIs. Use `mypy` or `pyright`.
+- **Python:** **All code must be strongly typed.** Type hints required on every function, method, variable declaration, and class attribute — not just public APIs. Run `mypy` or `pyright` in **strict mode** with zero errors. No `# type: ignore` without an accompanying comment explaining why.
 - **Rust:** Leverage type system. Use `Result<T, E>` for fallible operations.
 
 ## Testing Standards
+
+### Test-Driven Development (TDD) — Mandatory
+
+**All new code MUST be written using Test-Driven Development when possible.** TDD is not optional — it is the default methodology.
+
+1. **Red:** Write a failing test that defines the expected behavior.
+2. **Green:** Write the minimum code to make the test pass.
+3. **Refactor:** Clean up the implementation while keeping tests green.
+
+TDD applies to all layers — domain logic, application services, infrastructure adapters, and API endpoints. The only acceptable exceptions are:
+- Thin UI rendering layers that consume view models (the view model logic itself must be TDD).
+- Generated code (e.g., ORM migrations, protobuf stubs).
+- One-off scripts that will not be maintained.
+
+When modifying existing code that lacks tests, **write characterization tests first** before making changes.
+
+### Automated Regression & Local Full-Stack Testing
+
+Projects MUST build testing infrastructure that supports:
+
+- **Automated regression testing:** Every bug fix must include a regression test that reproduces the bug before the fix and passes after. CI must run the full regression suite on every PR.
+- **Local full-stack testing:** Developers and agents must be able to run the complete application stack locally (via `make dev` + `make test`) without relying on shared environments. Use Docker Compose, test containers, or in-memory substitutes to provide all external dependencies (databases, message queues, third-party APIs) locally.
+- **Test fixtures and factories:** Maintain reusable test data builders and fixtures. Never rely on production data for testing. Use deterministic seed data (see `make seed` in automation standards).
+- **CI parity:** Local test execution (`make test`) must run the same test suite as CI. No "works on CI but not locally" or vice versa.
 
 ### Test Structure
 
 - **Unit Tests:** Test domain logic in isolation. Mock external dependencies.
 - **Integration Tests:** Test layer interactions. Use test databases/containers.
 - **E2E Tests:** Test complete user workflows. Minimal set, high-value scenarios.
+- **Regression Tests:** Every bug fix includes a test that prevents recurrence.
 
-### Coverage Requirements
+### Coverage Requirements — 95% Absolute Minimum
 
-- **Domain:** 100% coverage. Business logic must be fully tested.
-- **Application:** 90%+ coverage. All use cases tested.
-- **Infrastructure:** 80%+ coverage. Critical paths tested.
+**95% test coverage is the absolute minimum for any module, in any layer.** There are no exceptions to this floor.
+
+| Layer | Min Coverage | Notes |
+|-------|-------------|-------|
+| Domain / Core | 100% | Pure business logic — no excuses |
+| Application / Shell | 95%+ | All use cases and orchestration paths tested |
+| Infrastructure / Integration | 95%+ | Adapters, repositories, and external integrations tested |
+
+Coverage gates MUST be enforced in CI. A PR that drops coverage below 95% in any module MUST NOT be merged.
 
 ### Test Organization
 
@@ -132,7 +163,8 @@ Strict adherence required. Violations must be justified in code comments.
 
 - **Branching:** Feature branches from `main`. Descriptive branch names: `feature/user-authentication`.
 - **Commits:** Atomic, meaningful commits. Use conventional commit format.
-- **Pull Requests:** Required for all changes. Code review mandatory.
+- **Pull Requests:** Required for all changes. Code review mandatory. PRs are the terminal step of all work — nothing is "done" without one.
+- **One task = one branch = one PR.** Each discrete unit of work gets its own branch and its own pull request.
 
 ### Commit Messages
 
@@ -189,12 +221,64 @@ Reference detailed standards in:
 - `standards/languages/10_rust_standards.md`
 - `standards/languages/11_zig_standards.md`
 
+## Work Tracking
+
+### GitHub Issues as Default Tracker
+
+**All identified work — features, bugs, tech debt, refactors, and follow-ups — MUST be tracked as GitHub Issues on the repository unless a project specifies an alternative tool.**
+
+#### What Must Be Tracked
+
+- **Bugs:** Every bug discovered during development, testing, or code review.
+- **Features:** New functionality, enhancements, and user-facing changes.
+- **Tech debt:** Shortcuts, known limitations, and deferred improvements.
+- **Follow-ups:** Items discovered during implementation that are out of scope for the current PR.
+- **TODOs:** Any `TODO` or `FIXME` comment added to the codebase MUST have a corresponding GitHub Issue. The comment must reference the issue number (e.g., `# TODO(#42): refactor once auth module is extracted`).
+
+#### Issue Requirements
+
+- **Title:** Clear, actionable description in imperative form (e.g., "Add rate limiting to /api/users endpoint").
+- **Labels:** Use consistent labels (`bug`, `enhancement`, `tech-debt`, `documentation`, etc.).
+- **Context:** Include enough detail for someone unfamiliar with the current work to understand and act on the issue.
+- **Linking:** PRs should reference related issues (`Closes #123`, `Fixes #456`, `Part of #789`).
+
+#### Overriding the Default Tracker
+
+Projects MAY use an alternative tracking tool (Jira, Linear, Shortcut, etc.) by specifying it in one of these locations:
+
+1. **`CLAUDE.md`** — in a `## Work Tracking` section.
+2. **`README.md`** — in project setup or contributing docs.
+3. **`.github/CONTRIBUTING.md`** — in the contribution guidelines.
+
+When an alternative is specified, all references to "GitHub Issues" in these standards should be read as referring to the configured tool. The same requirements (actionable titles, context, linking) still apply.
+
+#### Agent Responsibility
+
+AI agents MUST create GitHub Issues (or the project's configured tracker items) when they:
+- Discover bugs or failing edge cases during implementation.
+- Identify tech debt or shortcuts taken to meet scope.
+- Encounter out-of-scope work that should be addressed later.
+- Add `TODO` or `FIXME` comments to the codebase.
+
+Agents must NOT silently defer work. If something needs to be done, it needs to be tracked.
+
 ## Process Standards
 
 Reference detailed process standards in:
 - `standards/process/12_documentation_standards.md`
 - `standards/process/13_git_version_control_standards.md`
 - `standards/process/14_code_review_expectations.md`
+
+## Architecture Patterns
+
+Reference architecture pattern standards in:
+- `standards/architecture/16_data_versioning_and_migration_standards.md`
+- `standards/architecture/17_resilient_architecture_patterns.md`
+
+## Agent Workflow
+
+Reference agent workflow standards in:
+- `standards/process/15_agent_workflow_standards.md`
 
 
 

@@ -52,7 +52,32 @@ setup_ai_agents() {
             echo "⚠️  Failed to install Codex config (non-fatal, continuing...)"
         fi
     fi
-    
+
+    # Setup Claude Code
+    if [ -f "$AGENTS_DIR/claude-code/CLAUDE.md.template" ]; then
+        echo "📝 Setting up Claude Code..."
+        if [ ! -f "$PROJECT_ROOT/CLAUDE.md" ]; then
+            if cp "$AGENTS_DIR/claude-code/CLAUDE.md.template" "$PROJECT_ROOT/CLAUDE.md" 2>/dev/null; then
+                echo "✅ CLAUDE.md template installed at project root"
+                echo "💡 Customize CLAUDE.md with your project-specific details"
+            else
+                echo "⚠️  Failed to install CLAUDE.md (non-fatal, continuing...)"
+            fi
+        else
+            echo "ℹ️  CLAUDE.md already exists, skipping (won't overwrite project-specific guide)"
+        fi
+        if [ ! -f "$PROJECT_ROOT/.claude/settings.json" ]; then
+            mkdir -p "$PROJECT_ROOT/.claude"
+            if cp "$AGENTS_DIR/claude-code/settings.json.example" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null; then
+                echo "✅ Claude Code settings installed at .claude/settings.json"
+            else
+                echo "⚠️  Failed to install Claude Code settings (non-fatal, continuing...)"
+            fi
+        else
+            echo "ℹ️  .claude/settings.json already exists, skipping"
+        fi
+    fi
+
     # Setup Gemini CLI & Antigravity
     if [ -d "$STANDARDS_DIR/.gemini" ]; then
         GEMINI_SOURCE="$STANDARDS_DIR/.gemini"
@@ -61,7 +86,7 @@ setup_ai_agents() {
     else
         GEMINI_SOURCE=""
     fi
-    
+
     if [ -n "$GEMINI_SOURCE" ] && [ -d "$GEMINI_SOURCE" ]; then
         echo "📝 Setting up Gemini CLI & Antigravity..."
         mkdir -p "$PROJECT_ROOT/.gemini"
@@ -237,9 +262,17 @@ if [ -f "$PROJECT_ROOT/.gitignore" ]; then
         echo "# Standards temporary files" >> "$PROJECT_ROOT/.gitignore"
         echo ".standards_tmp/" >> "$PROJECT_ROOT/.gitignore"
     fi
+    if ! grep -q "coverage/" "$PROJECT_ROOT/.gitignore" 2>/dev/null; then
+        echo "" >> "$PROJECT_ROOT/.gitignore"
+        echo "# Test coverage output" >> "$PROJECT_ROOT/.gitignore"
+        echo "coverage/" >> "$PROJECT_ROOT/.gitignore"
+    fi
 elif [ "$SCRIPT_DIR" != "$PROJECT_ROOT" ]; then
     # Create .gitignore if it doesn't exist (only for client projects, not standards repo itself)
     cat > "$PROJECT_ROOT/.gitignore" << 'GITIGNORE'
+# Test coverage output
+coverage/
+
 # Standards temporary files
 .standards_tmp/
 
@@ -251,13 +284,27 @@ fi
 echo ""
 echo "✅ Setup complete!"
 echo ""
+echo "🔧 GitHub Project Lifecycle Automation:"
+echo ""
+echo "To use the gh-task CLI tool:"
+echo "1. Symlink to your PATH:"
+echo "   mkdir -p bin && ln -s $STANDARDS_DIR/bin/gh-task bin/gh-task"
+echo "2. Configure your project:"
+echo "   mkdir -p .gemini"
+echo "   cp $STANDARDS_DIR/templates/settings.json.example .gemini/settings.json"
+echo "   # Edit .gemini/settings.json with your PROJECT_ID"
+echo "3. See documentation:"
+echo "   - Complete guide: $STANDARDS_DIR/docs/GH_TASK_GUIDE.md"
+echo "   - AI agent guide: $STANDARDS_DIR/docs/TOOLING.md"
+echo ""
 echo "Next steps:"
 echo "1. Fully quit and restart Cursor to load .cursorrules and custom commands"
 echo "2. If using GitHub Copilot, restart your IDE to load .github/copilot-instructions.md"
 echo "3. If using Aider, it will automatically use .aiderrc"
 echo "4. If using Codex, ensure your IDE reads .codexrc"
-echo "5. If using Gemini CLI, it will automatically use .gemini/GEMINI.md and .gemini/settings.json"
-echo "6. If using submodule, ensure it's initialized: git submodule update --init"
-echo "7. To sync standards later, run: ./sync-standards.sh (or cd .standards && git pull)"
+echo "5. If using Claude Code, customize CLAUDE.md with your project details"
+echo "6. If using Gemini CLI, it will automatically use .gemini/GEMINI.md and .gemini/settings.json"
+echo "7. If using submodule, ensure it's initialized: git submodule update --init"
+echo "8. To sync standards later, run: ./sync-standards.sh (or cd .standards && git pull)"
 echo "   Note: After syncing, fully restart your IDE again to load updated configurations"
 

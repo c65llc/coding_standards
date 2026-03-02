@@ -61,6 +61,13 @@ Strict adherence required. Violations must be justified in code comments.
 * Boolean variables use `is_`, `has_`, `should_`, `can_` prefixes.
 * Functions are verbs. Classes are nouns.
 
+**Architectural Naming:**
+
+* Use distinct naming prefixes for library crates/packages vs. app crates/packages. This makes it immediately clear which architectural layer a module belongs to.
+* Library/framework packages use a framework prefix (e.g., `lattice-core`, `lattice-layout`).
+* App/product packages use a product prefix (e.g., `trellis-cli`, `trellis-desktop`).
+* Document the naming convention in the project's AI guide (`CLAUDE.md`) or `README.md`.
+
 ### Code Style
 
 * **Comments:** Only "Why", never "What". Self-documenting code preferred.
@@ -78,28 +85,55 @@ Strict adherence required. Violations must be justified in code comments.
 ### Type Safety
 
 * **TypeScript:** Strict mode enabled. No `any` without explicit justification.
-* **Python:** Type hints required for all public APIs. Use `mypy` or `pyright`.
+* **Python:** **All code must be strongly typed.** Type hints required on every function, method, variable declaration, and class attribute — not just public APIs. Run `mypy` or `pyright` in **strict mode** with zero errors. No `# type: ignore` without an accompanying comment explaining why.
 * **Rust:** Leverage type system. Use `Result<T, E>` for fallible operations.
 
 ## 4. Testing Standards
+
+### Test-Driven Development (TDD) — Mandatory
+
+**All new code MUST be written using Test-Driven Development when possible.** TDD is the default methodology, not an optional practice.
+
+1. **Red:** Write a failing test that defines the expected behavior.
+2. **Green:** Write the minimum code to make the test pass.
+3. **Refactor:** Clean up the implementation while keeping tests green.
+
+When modifying existing untested code, write characterization tests first before making changes.
+
+### Automated Regression & Local Full-Stack Testing
+
+* **Regression tests:** Every bug fix MUST include a test that reproduces the bug and prevents recurrence.
+* **Local full-stack testing:** The complete application stack must be runnable locally via `make dev` + `make test`. Use Docker Compose, test containers, or in-memory substitutes for all external dependencies.
+* **CI parity:** Local `make test` must run the same suite as CI. No environment-specific test gaps.
 
 ### Test Structure
 
 * **Unit Tests:** Test domain logic in isolation. Mock external dependencies.
 * **Integration Tests:** Test layer interactions. Use test databases/containers.
 * **E2E Tests:** Test complete user workflows. Minimal set, high-value scenarios.
+* **Regression Tests:** Every bug fix includes a test that prevents recurrence.
 
-### Coverage Requirements
+### Coverage Requirements — 95% Absolute Minimum
+
+**95% test coverage is the absolute minimum for any module, in any layer.**
 
 * **Domain:** 100% coverage. Business logic must be fully tested.
-* **Application:** 90%+ coverage. All use cases tested.
-* **Infrastructure:** 80%+ coverage. Critical paths tested.
+* **Application:** 95%+ coverage. All use cases and orchestration paths tested.
+* **Infrastructure:** 95%+ coverage. Adapters and integrations tested.
+
+Coverage gates MUST be enforced in CI. A PR that drops any module below 95% MUST NOT be merged.
 
 ### Test Organization
 
 * Mirror source structure: `src/domain/user.py` → `tests/domain/test_user.py`
 * Use descriptive test names: `test_should_raise_error_when_email_is_invalid`
 * One assertion per test when possible.
+
+### Pure Logic Separation
+
+* View model transformations and business logic SHOULD be pure functions testable without framework dependencies.
+* UI rendering layers should consume view models (plain data structures) rather than computing state inline.
+* This enables testing complex UI behavior (sidebar trees, drag-drop logic, navigation) without spinning up a framework runtime.
 
 ## 5. Dependency Management
 
@@ -147,7 +181,8 @@ Strict adherence required. Violations must be justified in code comments.
 
 * **Branching:** Feature branches from `main`. Descriptive branch names: `feature/user-authentication`.
 * **Commits:** Atomic, meaningful commits. Use conventional commit format.
-* **Pull Requests:** Required for all changes. Code review mandatory.
+* **Pull Requests:** Required for all changes. Code review mandatory. PRs are the terminal step of all work — nothing is "done" without one.
+* **One task = one branch = one PR.** Each discrete unit of work gets its own branch and its own pull request.
 
 ### Commit Messages
 
@@ -177,7 +212,17 @@ Example: `feat(domain): add user email validation`
 * Explain non-obvious design decisions.
 * Reference related issues/PRs when applicable.
 
-## 9. Security
+## 9. Work Tracking
+
+* **Default tool:** GitHub Issues. All bugs, features, tech debt, and follow-ups MUST be tracked.
+* **TODOs in code:** Every `TODO` or `FIXME` comment MUST reference a GitHub Issue number (e.g., `# TODO(#42): ...`).
+* **PR linking:** PRs must reference related issues (`Closes #123`, `Fixes #456`).
+* **Override:** Projects may specify an alternative tracker (Jira, Linear, etc.) in `CLAUDE.md`, `README.md`, or `.github/CONTRIBUTING.md`.
+* **Agents:** AI agents must create issues when they discover bugs, identify tech debt, or add TODO comments. Never silently defer work.
+
+See `standards/shared/core-standards.md` for full details.
+
+## 10. Security
 
 ### Secrets Management
 

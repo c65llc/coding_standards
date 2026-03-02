@@ -1,0 +1,759 @@
+#!/usr/bin/env bash
+# gh-task - GitHub Project V2 Lifecycle Management CLI
+# 
+# A CLI utility for managing GitHub Issues with Projects V2 integration.
+# Enables seamless workflow from issue creation to Draft PR submission.
+#
+# Usage:
+#   gh-task create "Title"     - Create a new issue in Project V2 "Todo"
+#   gh-task start <id>         - Move issue to "In Progress" and create branch
+#   gh-task status             - Show current task status
+#   gh-task update "msg"       - Add progress comment to issue
+#   gh-task submit             - Run validation, push, create Draft PR, move to "In Review"
+
+set -e
+
+# Color output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Configuration defaults
+CONFIG_FILE="${GH_TASK_CONFIG:-.gh-task.conf}"
+SETTINGS_FILE=".gemini/settings.json"
+
+# State file to track current task
+STATE_FILE=".gh-task-state"
+
+# Helper functions
+error() {
+    echo -e "${RED}❌ Error: $1${NC}" >&2
+    exit 1
+}
+
+success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+info() {
+    echo -e "${BLUE}ℹ️  $1${NC}"
+}
+
+warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+# Check prerequisites
+check_prerequisites() {
+    if ! command -v gh >/dev/null 2>&1; then
+        error "GitHub CLI (gh) not found. Install from: https://cli.github.com"
+    fi
+    
+    if ! gh auth status >/dev/null 2>&1; then
+        error "Not authenticated with GitHub. Run: gh auth login"
+    fi
+    
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        error "Not in a git repository"
+    fi
+}
+
+# Load configuration
+load_config() {
+    # Try to load from .gemini/settings.json first
+    if [ -f "$SETTINGS_FILE" ]; then
+        if command -v jq >/dev/null 2>&1; then
+            PROJECT_ID=$(jq -r '.project_id // empty' "$SETTINGS_FILE" 2>/dev/null || echo "")
+            STATUS_FIELD_ID=$(jq -r '.status_field_id // empty' "$SETTINGS_FILE" 2>/dev/null || echo "")
+        fi
+    fi
+    
+    # Fall back to .gh-task.conf (safely parse only PROJECT_ID and STATUS_FIELD_ID)
+    if [ -f "$CONFIG_FILE" ]; then
+        # Safely extract PROJECT_ID and STATUS_FIELD_ID without executing arbitrary code
+        while IFS='=' read -r key value; do
+            # Skip comments and empty lines
+            [[ "$key" =~ ^[[:space:]]*# ]] && continue
+            [[ -z "$key" ]] && continue
+            
+            # Remove leading/trailing whitespace and quotes
+            key=$(echo "$key" | xargs)
+            value=$(echo "$value" | xargs | sed 's/^["'\'']//' | sed 's/["'\'']$//')
+            
+            case "$key" in
+                PROJECT_ID)
+                    PROJECT_ID="$value"
+                    ;;
+                STATUS_FIELD_ID)
+                    STATUS_FIELD_ID="$value"
+                    ;;
+                REPO_OWNER)
+                    REPO_OWNER="$value"
+                    ;;
+                REPO_NAME)
+                    REPO_NAME="$value"
+                    ;;
+            esac
+        done < "$CONFIG_FILE"
+    fi
+    
+    # Get repository info
+    REPO_OWNER=$(gh repo view --json owner --jq '.owner.login' 2>/dev/null || echo "")
+    REPO_NAME=$(gh repo view --json name --jq '.name' 2>/dev/null || echo "")
+    
+    if [ -z "$REPO_OWNER" ] || [ -z "$REPO_NAME" ]; then
+        error "Could not determine repository information"
+    fi
+}
+
+# Save current task state
+save_state() {
+    local issue_number="$1"
+    local branch_name="$2"
+    cat > "$STATE_FILE" <<EOF
+CURRENT_ISSUE=$issue_number
+CURRENT_BRANCH=$branch_name
+STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+EOF
+}
+
+# Load current task state
+load_state() {
+    if [ -f "$STATE_FILE" ]; then
+        source "$STATE_FILE"
+    fi
+}
+
+# Clear task state
+clear_state() {
+    rm -f "$STATE_FILE"
+}
+
+# Sanitize title for branch name
+sanitize_title() {
+    local title="$1"
+    # Convert to lowercase, replace spaces with hyphens, remove special chars
+    echo "$title" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//' | cut -c1-50
+}
+
+# Get Project V2 field option ID by name
+get_status_option_id() {
+    local status_name="$1"
+    
+    if [ -z "$PROJECT_ID" ]; then
+        warning "PROJECT_ID not configured. Skipping project status update."
+        return 1
+    fi
+    
+    # Query the project to get field options
+    local query='query($projectId: ID!) {
+      node(id: $projectId) {
+        ... on ProjectV2 {
+          fields(first: 20) {
+            nodes {
+              ... on ProjectV2SingleSelectField {
+                id
+                name
+                options {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }'
+    
+    local result=$(gh api graphql -f query="$query" -f projectId="$PROJECT_ID" 2>/dev/null || echo "")
+    
+    if [ -z "$result" ]; then
+        warning "Could not fetch project fields"
+        return 1
+    fi
+    
+    # Parse the result to find the Status field and matching option
+    local option_id=$(echo "$result" | jq -r --arg status "$status_name" '
+        .data.node.fields.nodes[] | 
+        select(.name == "Status") | 
+        .options[] | 
+        select(.name == $status) | 
+        .id' 2>/dev/null || echo "")
+    
+    if [ -z "$option_id" ]; then
+        # Try case-insensitive match
+        option_id=$(echo "$result" | jq -r --arg status "$status_name" '
+            .data.node.fields.nodes[] | 
+            select(.name == "Status") | 
+            .options[] | 
+            select(.name | ascii_downcase == ($status | ascii_downcase)) | 
+            .id' 2>/dev/null || echo "")
+    fi
+    
+    if [ -z "$option_id" ]; then
+        warning "Could not find status option: $status_name"
+        return 1
+    fi
+    
+    echo "$option_id"
+}
+
+# Get the status field ID
+get_status_field_id() {
+    if [ -n "$STATUS_FIELD_ID" ]; then
+        echo "$STATUS_FIELD_ID"
+        return 0
+    fi
+    
+    if [ -z "$PROJECT_ID" ]; then
+        return 1
+    fi
+    
+    local query='query($projectId: ID!) {
+      node(id: $projectId) {
+        ... on ProjectV2 {
+          fields(first: 20) {
+            nodes {
+              ... on ProjectV2SingleSelectField {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }'
+    
+    local result=$(gh api graphql -f query="$query" -f projectId="$PROJECT_ID" 2>/dev/null || echo "")
+    
+    local field_id=$(echo "$result" | jq -r '
+        .data.node.fields.nodes[] | 
+        select(.name == "Status") | 
+        .id' 2>/dev/null || echo "")
+    
+    if [ -z "$field_id" ]; then
+        warning "Could not find Status field in project"
+        return 1
+    fi
+    
+    echo "$field_id"
+}
+
+# Get project item ID for an issue
+get_project_item_id() {
+    local issue_number="$1"
+    
+    if [ -z "$PROJECT_ID" ]; then
+        return 1
+    fi
+    
+    # Get the issue node ID first
+    local issue_id=$(gh api "repos/$REPO_OWNER/$REPO_NAME/issues/$issue_number" --jq '.node_id' 2>/dev/null || echo "")
+    
+    if [ -z "$issue_id" ]; then
+        warning "Could not get issue node ID"
+        return 1
+    fi
+    
+    # Query to find the project item
+    local query='query($projectId: ID!, $issueId: ID!) {
+      node(id: $projectId) {
+        ... on ProjectV2 {
+          items(first: 100) {
+            nodes {
+              id
+              content {
+                ... on Issue {
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }'
+    
+    local result=$(gh api graphql -f query="$query" -f projectId="$PROJECT_ID" -f issueId="$issue_id" 2>/dev/null || echo "")
+    
+    local item_id=$(echo "$result" | jq -r --arg issueId "$issue_id" '
+        .data.node.items.nodes[] | 
+        select(.content.id == $issueId) | 
+        .id' 2>/dev/null || echo "")
+    
+    if [ -z "$item_id" ]; then
+        warning "Could not find project item for issue #$issue_number"
+        return 1
+    fi
+    
+    echo "$item_id"
+}
+
+# Update project item status
+update_project_status() {
+    local issue_number="$1"
+    local status_name="$2"
+    
+    info "Updating project status to: $status_name"
+    
+    local item_id=$(get_project_item_id "$issue_number")
+    if [ -z "$item_id" ]; then
+        warning "Skipping project status update"
+        return 0
+    fi
+    
+    local field_id=$(get_status_field_id)
+    if [ -z "$field_id" ]; then
+        warning "Skipping project status update"
+        return 0
+    fi
+    
+    local option_id=$(get_status_option_id "$status_name")
+    if [ -z "$option_id" ]; then
+        warning "Skipping project status update"
+        return 0
+    fi
+    
+    # Update the project item
+    local mutation='mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+      updateProjectV2ItemFieldValue(
+        input: {
+          projectId: $projectId
+          itemId: $itemId
+          fieldId: $fieldId
+          value: { singleSelectOptionId: $optionId }
+        }
+      ) {
+        projectV2Item {
+          id
+        }
+      }
+    }'
+    
+    local result=$(gh api graphql \
+        -f query="$mutation" \
+        -f projectId="$PROJECT_ID" \
+        -f itemId="$item_id" \
+        -f fieldId="$field_id" \
+        -f optionId="$option_id" 2>/dev/null || echo "")
+    
+    if [ -n "$result" ]; then
+        success "Project status updated to: $status_name"
+    else
+        warning "Failed to update project status"
+    fi
+}
+
+# Add issue to project
+add_to_project() {
+    local issue_number="$1"
+    
+    if [ -z "$PROJECT_ID" ]; then
+        warning "PROJECT_ID not configured. Skipping project addition."
+        return 0
+    fi
+    
+    info "Adding issue to project..."
+    
+    # Get the issue node ID
+    local issue_id=$(gh api "repos/$REPO_OWNER/$REPO_NAME/issues/$issue_number" --jq '.node_id' 2>/dev/null || echo "")
+    
+    if [ -z "$issue_id" ]; then
+        warning "Could not get issue node ID"
+        return 0
+    fi
+    
+    # Add item to project
+    local mutation='mutation($projectId: ID!, $contentId: ID!) {
+      addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+        item {
+          id
+        }
+      }
+    }'
+    
+    local result=$(gh api graphql \
+        -f query="$mutation" \
+        -f projectId="$PROJECT_ID" \
+        -f contentId="$issue_id" 2>/dev/null || echo "")
+    
+    if [ -n "$result" ]; then
+        success "Issue added to project"
+        # Set initial status to "Todo"
+        update_project_status "$issue_number" "Todo"
+    else
+        warning "Failed to add issue to project (it may already be added)"
+    fi
+}
+
+# Command: create
+cmd_create() {
+    local title="$1"
+    
+    if [ -z "$title" ]; then
+        error "Title is required. Usage: gh-task create \"Title\""
+    fi
+    
+    info "Creating new issue: $title"
+    
+    # Create the issue
+    local issue_url=$(gh issue create --title "$title" --body "Created via gh-task CLI" 2>/dev/null || echo "")
+    
+    if [ -z "$issue_url" ]; then
+        error "Failed to create issue"
+    fi
+    
+    # Extract issue number from URL
+    local issue_number=$(echo "$issue_url" | grep -oP '\d+$')
+    
+    success "Created issue #$issue_number"
+    echo "$issue_url"
+    
+    # Add to project
+    add_to_project "$issue_number"
+}
+
+# Command: start
+cmd_start() {
+    local issue_number="$1"
+    
+    if [ -z "$issue_number" ]; then
+        error "Issue number is required. Usage: gh-task start <id>"
+    fi
+    
+    # Check if already working on a task
+    load_state
+    if [ -n "$CURRENT_ISSUE" ]; then
+        warning "Already working on issue #$CURRENT_ISSUE"
+        read -p "Switch to issue #$issue_number? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            info "Keeping current task"
+            exit 0
+        fi
+    fi
+    
+    info "Starting work on issue #$issue_number"
+    
+    # Get issue details
+    local issue_data=$(gh issue view "$issue_number" --json title,state 2>/dev/null || echo "")
+    
+    if [ -z "$issue_data" ]; then
+        error "Could not fetch issue #$issue_number"
+    fi
+    
+    local title=$(echo "$issue_data" | jq -r '.title' 2>/dev/null || echo "")
+    local state=$(echo "$issue_data" | jq -r '.state' 2>/dev/null || echo "")
+    
+    if [ "$state" = "CLOSED" ]; then
+        error "Issue #$issue_number is closed"
+    fi
+    
+    # Sanitize title for branch name
+    local sanitized=$(sanitize_title "$title")
+    local branch_name="task/${issue_number}-${sanitized}"
+    
+    info "Creating branch: $branch_name"
+    
+    # Create and checkout branch using gh issue develop
+    if gh issue develop "$issue_number" --name "$branch_name" --checkout 2>/dev/null; then
+        success "Checked out branch: $branch_name"
+    else
+        # Fallback: create branch manually
+        info "Falling back to manual branch creation"
+        if git checkout -b "$branch_name" 2>/dev/null; then
+            success "Created branch: $branch_name"
+        else
+            # Branch might already exist
+            if git checkout "$branch_name" 2>/dev/null; then
+                success "Checked out existing branch: $branch_name"
+            else
+                error "Failed to create/checkout branch: $branch_name"
+            fi
+        fi
+    fi
+    
+    # Save state
+    save_state "$issue_number" "$branch_name"
+    
+    # Update project status to "In Progress"
+    update_project_status "$issue_number" "In Progress"
+    
+    success "Started working on issue #$issue_number: $title"
+}
+
+# Command: status
+cmd_status() {
+    load_state
+    
+    if [ -z "$CURRENT_ISSUE" ]; then
+        info "No active task"
+        echo ""
+        echo "Available commands:"
+        echo "  gh-task create \"Title\"  - Create a new issue"
+        echo "  gh-task start <id>       - Start working on an issue"
+        exit 0
+    fi
+    
+    local current_branch=$(git branch --show-current 2>/dev/null || echo "")
+    
+    echo ""
+    echo -e "${BLUE}═══════════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}Current Task Status${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════${NC}"
+    echo ""
+    echo -e "  ${YELLOW}Issue:${NC}         #$CURRENT_ISSUE"
+    echo -e "  ${YELLOW}Branch:${NC}        $CURRENT_BRANCH"
+    echo -e "  ${YELLOW}Current Branch:${NC} $current_branch"
+    
+    if [ "$current_branch" != "$CURRENT_BRANCH" ]; then
+        echo ""
+        warning "You're not on the task branch!"
+        echo "  Run: git checkout $CURRENT_BRANCH"
+    fi
+    
+    echo ""
+    
+    # Get issue details
+    local issue_data=$(gh issue view "$CURRENT_ISSUE" --json title,url,state 2>/dev/null || echo "")
+    
+    if [ -n "$issue_data" ]; then
+        local title=$(echo "$issue_data" | jq -r '.title' 2>/dev/null || echo "")
+        local url=$(echo "$issue_data" | jq -r '.url' 2>/dev/null || echo "")
+        local state=$(echo "$issue_data" | jq -r '.state' 2>/dev/null || echo "")
+        
+        echo -e "  ${YELLOW}Title:${NC}         $title"
+        echo -e "  ${YELLOW}State:${NC}         $state"
+        echo -e "  ${YELLOW}URL:${NC}           $url"
+    fi
+    
+    # Check git status
+    echo ""
+    echo -e "${YELLOW}Git Status:${NC}"
+    git status --short
+    
+    echo ""
+    echo -e "${BLUE}═══════════════════════════════════════════════════${NC}"
+    echo ""
+}
+
+# Command: update
+cmd_update() {
+    local message="$1"
+    
+    if [ -z "$message" ]; then
+        error "Message is required. Usage: gh-task update \"message\""
+    fi
+    
+    load_state
+    
+    if [ -z "$CURRENT_ISSUE" ]; then
+        error "No active task. Use 'gh-task start <id>' first"
+    fi
+    
+    info "Adding progress comment to issue #$CURRENT_ISSUE"
+    
+    # Add comment to issue
+    if gh issue comment "$CURRENT_ISSUE" --body "**Progress Update:** $message" 2>/dev/null; then
+        success "Comment added to issue #$CURRENT_ISSUE"
+    else
+        error "Failed to add comment"
+    fi
+}
+
+# Command: submit
+cmd_submit() {
+    load_state
+    
+    if [ -z "$CURRENT_ISSUE" ]; then
+        error "No active task. Use 'gh-task start <id>' first"
+    fi
+    
+    info "Submitting task for issue #$CURRENT_ISSUE"
+    
+    # Check if we're on the correct branch
+    local current_branch=$(git branch --show-current 2>/dev/null || echo "")
+    if [ "$current_branch" != "$CURRENT_BRANCH" ]; then
+        warning "Not on task branch. Switching to $CURRENT_BRANCH"
+        git checkout "$CURRENT_BRANCH" || error "Failed to checkout branch"
+    fi
+    
+    # Check for uncommitted changes
+    if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+        warning "You have uncommitted changes"
+        git status --short
+        echo ""
+        read -p "Commit all changes? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            read -p "Enter commit message: " commit_msg
+            git add -A
+            git commit -m "$commit_msg" || error "Failed to commit changes"
+        else
+            error "Please commit or stash changes before submitting"
+        fi
+    fi
+    
+    # Run validation if test command exists
+    info "Running validation checks..."
+    
+    # Create temporary file for test output
+    local test_output=$(mktemp)
+    trap "rm -f $test_output" EXIT
+    
+    # Check for common test commands
+    if [ -f "package.json" ] && grep -q "\"test\"" package.json 2>/dev/null; then
+        info "Running npm test..."
+        if ! npm test 2>&1 | tee "$test_output"; then
+            error "Tests failed. Please fix before submitting.\n$(tail -20 "$test_output")"
+        fi
+        success "Tests passed"
+    elif [ -f "Makefile" ] && grep -q "^test:" Makefile 2>/dev/null; then
+        info "Running make test..."
+        if ! make test 2>&1 | tee "$test_output"; then
+            error "Tests failed. Please fix before submitting.\n$(tail -20 "$test_output")"
+        fi
+        success "Tests passed"
+    elif [ -f "pytest.ini" ] || [ -f "setup.py" ]; then
+        info "Running pytest..."
+        if command -v pytest >/dev/null 2>&1; then
+            if ! pytest 2>&1 | tee "$test_output"; then
+                error "Tests failed. Please fix before submitting.\n$(tail -20 "$test_output")"
+            fi
+            success "Tests passed"
+        fi
+    else
+        warning "No test command found, skipping validation"
+    fi
+    
+    # Push branch to remote
+    info "Pushing branch to remote..."
+    if ! git push -u origin "$CURRENT_BRANCH" 2>/dev/null; then
+        error "Failed to push branch"
+    fi
+    success "Branch pushed to remote"
+    
+    # Create draft PR
+    info "Creating draft pull request..."
+    
+    local pr_body="Closes #$CURRENT_ISSUE
+
+This PR addresses the work tracked in issue #$CURRENT_ISSUE.
+
+## Changes
+<!-- Describe your changes here -->
+
+## Testing
+<!-- Describe how you tested your changes -->
+
+---
+*Created via gh-task CLI*"
+    
+    local pr_url=$(gh pr create \
+        --draft \
+        --title "$(gh issue view "$CURRENT_ISSUE" --json title --jq '.title')" \
+        --body "$pr_body" 2>/dev/null || echo "")
+    
+    if [ -z "$pr_url" ]; then
+        error "Failed to create pull request"
+    fi
+    
+    success "Draft PR created: $pr_url"
+    
+    # Update project status to "In Review"
+    update_project_status "$CURRENT_ISSUE" "In Review"
+    
+    success "Task submitted successfully!"
+    echo ""
+    echo "Next steps:"
+    echo "  1. Review the PR at: $pr_url"
+    echo "  2. Mark as 'Ready for review' when complete"
+    echo "  3. Request reviewers"
+    
+    # Clear state after successful submission
+    clear_state
+}
+
+# Show usage
+show_usage() {
+    cat << EOF
+gh-task - GitHub Project V2 Lifecycle Management CLI
+
+Usage:
+  gh-task create "Title"      Create a new issue and add to Project V2 "Todo"
+  gh-task start <id>          Move issue to "In Progress" and create branch
+  gh-task status              Show current task status
+  gh-task update "message"    Add progress comment to issue
+  gh-task submit              Run validation, push, create Draft PR, move to "In Review"
+  gh-task help                Show this help message
+
+Configuration:
+  Set PROJECT_ID and STATUS_FIELD_ID in .gemini/settings.json or .gh-task.conf
+
+  Example .gemini/settings.json:
+  {
+    "project_id": "PVT_kwDOABCDEF",
+    "status_field_id": "PVTSSF_lADOABCDEF"
+  }
+
+Environment Variables:
+  GH_TASK_CONFIG    Path to config file (default: .gh-task.conf)
+
+Examples:
+  gh-task create "Add user authentication"
+  gh-task start 42
+  gh-task status
+  gh-task update "Implemented login endpoint"
+  gh-task submit
+
+For more information, see: docs/GH_TASK_GUIDE.md
+EOF
+}
+
+# Main command dispatcher
+main() {
+    if [ $# -eq 0 ]; then
+        show_usage
+        exit 1
+    fi
+    
+    local command="$1"
+    shift
+    
+    case "$command" in
+        create)
+            check_prerequisites
+            load_config
+            cmd_create "$@"
+            ;;
+        start)
+            check_prerequisites
+            load_config
+            cmd_start "$@"
+            ;;
+        status)
+            check_prerequisites
+            load_config
+            cmd_status "$@"
+            ;;
+        update)
+            check_prerequisites
+            load_config
+            cmd_update "$@"
+            ;;
+        submit)
+            check_prerequisites
+            load_config
+            cmd_submit "$@"
+            ;;
+        help|--help|-h)
+            show_usage
+            ;;
+        *)
+            error "Unknown command: $command\n\nRun 'gh-task help' for usage information"
+            ;;
+    esac
+}
+
+main "$@"

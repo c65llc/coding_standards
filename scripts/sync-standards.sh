@@ -75,7 +75,31 @@ sync_ai_agents() {
             fi
         fi
     fi
-    
+
+    # Sync Claude Code
+    if [ -d "$AGENTS_DIR/claude-code" ]; then
+        if [ ! -f "$PROJECT_ROOT/CLAUDE.md" ]; then
+            if [ -f "$AGENTS_DIR/claude-code/CLAUDE.md.template" ]; then
+                echo "📝 Adding Claude Code guide (CLAUDE.md not yet configured)..."
+                if cp "$AGENTS_DIR/claude-code/CLAUDE.md.template" "$PROJECT_ROOT/CLAUDE.md" 2>/dev/null; then
+                    echo "✅ CLAUDE.md template added at project root"
+                    echo "💡 Customize CLAUDE.md with your project-specific details"
+                fi
+            fi
+        else
+            echo "ℹ️  CLAUDE.md exists (project-specific, not overwritten by sync)"
+        fi
+        if [ ! -f "$PROJECT_ROOT/.claude/settings.json" ]; then
+            if [ -f "$AGENTS_DIR/claude-code/settings.json.example" ]; then
+                echo "📝 Adding Claude Code settings..."
+                mkdir -p "$PROJECT_ROOT/.claude"
+                if cp "$AGENTS_DIR/claude-code/settings.json.example" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null; then
+                    echo "✅ Claude Code settings added at .claude/settings.json"
+                fi
+            fi
+        fi
+    fi
+
     # Sync Gemini CLI & Antigravity
     if [ -d "$STANDARDS_DIR/.gemini" ]; then
         GEMINI_SOURCE="$STANDARDS_DIR/.gemini"
@@ -84,10 +108,10 @@ sync_ai_agents() {
     else
         GEMINI_SOURCE=""
     fi
-    
+
     if [ -n "$GEMINI_SOURCE" ] && [ -d "$GEMINI_SOURCE" ]; then
         mkdir -p "$PROJECT_ROOT/.gemini"
-        
+
         # Sync GEMINI.md
         if [ -f "$GEMINI_SOURCE/GEMINI.md" ]; then
             if [ ! -f "$PROJECT_ROOT/.gemini/GEMINI.md" ]; then
@@ -102,7 +126,7 @@ sync_ai_agents() {
                 fi
             fi
         fi
-        
+
         # Sync settings.json
         if [ -f "$GEMINI_SOURCE/settings.json" ]; then
             # Validate JSON syntax before copying
@@ -118,7 +142,7 @@ sync_ai_agents() {
                     JSON_VALID=false
                 fi
             fi
-            
+
             if [ "$JSON_VALID" = true ]; then
                 if [ ! -f "$PROJECT_ROOT/.gemini/settings.json" ]; then
                     echo "📝 Adding Gemini CLI settings (not yet configured)..."

@@ -3,7 +3,7 @@ import starlight from '@astrojs/starlight';
 import starlightBlog from 'starlight-blog';
 
 export default defineConfig({
-  site: 'https://coding_standards.c65llc.com',
+  site: 'https://coding-standards.c65llc.com',
   integrations: [
     starlight({
       plugins: [starlightBlog()],
@@ -54,7 +54,7 @@ export default defineConfig({
           tag: 'meta',
           attrs: {
             property: 'og:image',
-            content: 'https://coding_standards.c65llc.com/og-image.png',
+            content: 'https://coding-standards.c65llc.com/og-image.png',
           },
         },
       ],

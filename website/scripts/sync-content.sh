@@ -30,7 +30,10 @@ add_frontmatter() {
 
     # Extract title from first H1 heading, or use filename
     local title
-    title=$(grep -m1 '^# ' "$file" | sed 's/^# //' || basename "$file" .md)
+    title=$(grep -m1 '^# ' "$file" | sed 's/^# //')
+    if [ -z "$title" ]; then
+        title=$(basename "$file" .md)
+    fi
 
     # Check if file already has frontmatter
     if head -1 "$file" | grep -q '^---$'; then

@@ -29,7 +29,7 @@ The installer sets up the following in your project:
 | GitHub Copilot | `.github/copilot-instructions.md` | Supported |
 | Claude Code / Aider | `.aiderrc` | Supported |
 | OpenAI Codex | `.codexrc` | Supported |
-| Gemini CLI | `.gemini/GEMINI.md` | Supported |
+| Gemini CLI | `.gemini/GEMINI.md`, `.gemini/settings.json` | Supported |
 
 ## Supported Languages
 
@@ -45,10 +45,10 @@ Python, Java, Kotlin, Swift, Dart, TypeScript, JavaScript, Rust, Zig
 
 ## Documentation
 
-- [Quick Start](https://coding_standards.c65llc.com/docs/getting-started/quick-start/)
-- [Installation Guide](https://coding_standards.c65llc.com/docs/getting-started/installation/)
-- [Multi-Agent Setup](https://coding_standards.c65llc.com/docs/guides/multi-agent-setup/)
-- [Full Documentation](https://coding_standards.c65llc.com)
+- [Quick Start](https://coding-standards.c65llc.com/getting-started/quick-start/)
+- [Installation Guide](https://coding-standards.c65llc.com/getting-started/installation/)
+- [Multi-Agent Setup](https://coding-standards.c65llc.com/guides/multi-agent-setup/)
+- [Full Documentation](https://coding-standards.c65llc.com)
 
 ## Contributing
 

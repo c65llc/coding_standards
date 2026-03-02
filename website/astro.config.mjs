@@ -1,18 +1,17 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightBlog from 'starlight-blog';
 
 export default defineConfig({
   site: 'https://coding_standards.c65llc.com',
-  legacy: {
-    collections: true,
-  },
   integrations: [
     starlight({
+      plugins: [starlightBlog()],
       title: 'Coding Standards',
       description: 'Unified coding standards for every AI coding assistant.',
-      social: {
-        github: 'https://github.com/c65llc/coding_standards',
-      },
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/c65llc/coding_standards' },
+      ],
       defaultLocale: 'root',
       locales: {
         root: { label: 'English', lang: 'en' },

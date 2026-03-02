@@ -1,0 +1,19 @@
+{
+  "name": "coding-standards-website",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "prebuild": "bash scripts/sync-content.sh",
+    "predev": "bash scripts/sync-content.sh"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.37.6",
+    "astro": "^5.0.0",
+    "sharp": "^0.33.0",
+    "starlight-blog": "^0.25.3"
+  }
+}

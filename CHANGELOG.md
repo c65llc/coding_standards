@@ -32,10 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Testing Infrastructure**
   - `scripts/test-gh-task.sh` - Comprehensive test suite for gh-task
   - `make test-gh-task` - Makefile target for testing
-- Multi-agent support for GitHub Copilot, Aider (Claude Code), and OpenAI Codex
+- Multi-agent support for GitHub Copilot, Aider (Claude Code), OpenAI Codex, Gemini CLI, and Google Antigravity
 - `.github/copilot-instructions.md` for GitHub Copilot configuration
 - `.aiderrc` for Aider (Claude Code) configuration
 - `.codexrc` for OpenAI Codex configuration
+- `.gemini/GEMINI.md` for Gemini CLI and Antigravity repository intelligence
+- `.gemini/settings.json` for Gemini CLI configuration (checkpointing, model, MCP servers)
 - `standards/shared/core-standards.md` - Shared core standards for all agents
 - `standards/agents/` directory structure for agent-specific configurations
 - `make setup-agents` target for setting up AI agent configurations
@@ -46,14 +48,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated `README.md` with GitHub Project Lifecycle Automation section
 - Updated `README.md` repository structure to include new components
-- Updated `scripts/setup.sh` to include gh-task setup instructions
-- Updated `install.sh` to reference gh-task tooling
+- Updated `scripts/setup.sh` to include gh-task setup instructions and detect/configure multiple AI agents (including Gemini CLI and Antigravity)
+- Updated `scripts/sync-standards.sh` to sync all agent configurations (including Gemini CLI and Antigravity)
+- Updated `install.sh` to reference gh-task tooling and show which agent configurations were installed
 - Updated `.gitignore` to exclude `.gh-task-state` and `.gh-task.conf` files
 - Updated `Makefile` with `test-gh-task` target
-- Updated `scripts/setup.sh` to detect and configure multiple AI agents
-- Updated `scripts/sync-standards.sh` to sync all agent configurations
-- Updated `install.sh` to show which agent configurations were installed
+- Updated `docs/MULTI_AGENT_GUIDE.md` to include Gemini CLI and Antigravity setup and usage instructions
 - Updated `STRUCTURE.md` to include new agent directories
+- Updated `.gitignore` to exclude `.gemini/active_mission.log` (Antigravity mission tracking)
 
 ### Improved
 - Better collaboration support for non-Cursor users

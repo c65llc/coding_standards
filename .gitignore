@@ -18,6 +18,27 @@ Thumbs.db
 !.cursor/commands/
 !.cursor/commands/**
 
+# Gemini CLI files (but track .gemini/ config files)
+.gemini/active_mission.log
+
+# Worktrees
+.worktrees/
+
+# Node.js
+node_modules/
+
+# Website build artifacts
+website/dist/
+website/.astro/
+website/node_modules/
+
+# Synced content (generated at build time by scripts/sync-content.sh)
+website/src/content/docs/getting-started/
+website/src/content/docs/guides/
+website/src/content/docs/reference/
+website/src/content/docs/standards/
+website/src/content/docs/changelog.md
+
 # Temporary files
 *.tmp
 *.temp

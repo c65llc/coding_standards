@@ -99,6 +99,65 @@ sync_ai_agents() {
             fi
         fi
     fi
+
+    # Sync Gemini CLI & Antigravity
+    if [ -d "$STANDARDS_DIR/.gemini" ]; then
+        GEMINI_SOURCE="$STANDARDS_DIR/.gemini"
+    elif [ -d "$SCRIPT_DIR/../.gemini" ]; then
+        GEMINI_SOURCE="$SCRIPT_DIR/../.gemini"
+    else
+        GEMINI_SOURCE=""
+    fi
+
+    if [ -n "$GEMINI_SOURCE" ] && [ -d "$GEMINI_SOURCE" ]; then
+        mkdir -p "$PROJECT_ROOT/.gemini"
+
+        # Sync GEMINI.md
+        if [ -f "$GEMINI_SOURCE/GEMINI.md" ]; then
+            if [ ! -f "$PROJECT_ROOT/.gemini/GEMINI.md" ]; then
+                echo "📝 Adding Gemini CLI configuration (not yet configured)..."
+                if cp "$GEMINI_SOURCE/GEMINI.md" "$PROJECT_ROOT/.gemini/GEMINI.md" 2>/dev/null; then
+                    echo "✅ Gemini configuration added at .gemini/GEMINI.md"
+                fi
+            elif [ "$UPDATED" = true ] || ! cmp -s "$GEMINI_SOURCE/GEMINI.md" "$PROJECT_ROOT/.gemini/GEMINI.md" 2>/dev/null; then
+                echo "📝 Updating Gemini configuration..."
+                if cp "$GEMINI_SOURCE/GEMINI.md" "$PROJECT_ROOT/.gemini/GEMINI.md" 2>/dev/null; then
+                    echo "✅ Gemini configuration updated"
+                fi
+            fi
+        fi
+
+        # Sync settings.json
+        if [ -f "$GEMINI_SOURCE/settings.json" ]; then
+            # Validate JSON syntax before copying
+            JSON_VALID=true
+            if command -v python3 >/dev/null 2>&1; then
+                if ! python3 -m json.tool "$GEMINI_SOURCE/settings.json" >/dev/null 2>&1; then
+                    echo "⚠️  Invalid JSON in Gemini settings.json, skipping update..."
+                    JSON_VALID=false
+                fi
+            elif command -v jq >/dev/null 2>&1; then
+                if ! jq empty "$GEMINI_SOURCE/settings.json" >/dev/null 2>&1; then
+                    echo "⚠️  Invalid JSON in Gemini settings.json, skipping update..."
+                    JSON_VALID=false
+                fi
+            fi
+
+            if [ "$JSON_VALID" = true ]; then
+                if [ ! -f "$PROJECT_ROOT/.gemini/settings.json" ]; then
+                    echo "📝 Adding Gemini CLI settings (not yet configured)..."
+                    if cp "$GEMINI_SOURCE/settings.json" "$PROJECT_ROOT/.gemini/settings.json" 2>/dev/null; then
+                        echo "✅ Gemini CLI settings added at .gemini/settings.json"
+                    fi
+                elif [ "$UPDATED" = true ] || ! cmp -s "$GEMINI_SOURCE/settings.json" "$PROJECT_ROOT/.gemini/settings.json" 2>/dev/null; then
+                    echo "📝 Updating Gemini CLI settings..."
+                    if cp "$GEMINI_SOURCE/settings.json" "$PROJECT_ROOT/.gemini/settings.json" 2>/dev/null; then
+                        echo "✅ Gemini CLI settings updated"
+                    fi
+                fi
+            fi
+        fi
+    fi
 }
 
 echo "🔄 Syncing project standards..."

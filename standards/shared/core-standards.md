@@ -221,6 +221,7 @@ Example: `feat(domain): add user email validation`
 - Enforce HTTPS/TLS for all external communication.
 - Configure security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options).
 - Never log passwords, tokens, API keys, or PII.
+- Implement rate limiting on all public-facing APIs to mitigate abuse and denial-of-service. Treat missing rate limiting on public endpoints as at least a P2 security finding.
 - Add `.env` to `.gitignore`. Never commit `.env` files.
 
 ### Secrets Management

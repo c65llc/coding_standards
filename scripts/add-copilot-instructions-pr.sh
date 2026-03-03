@@ -164,6 +164,3 @@ echo ""
 echo "✅ PR created successfully!"
 echo "📝 Don't forget to enable Copilot code review in repository settings after merging:"
 echo "   Settings > Copilot > Code review > 'Use custom instructions when reviewing pull requests'"
-
-
-

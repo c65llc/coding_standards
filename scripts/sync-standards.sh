@@ -11,7 +11,7 @@ sync_ai_agents() {
     local STANDARDS_DIR="$1"
     local SCRIPT_DIR="$2"
     local PROJECT_ROOT="$3"
-    
+
     local AGENTS_DIR=""
     if [ -d "$STANDARDS_DIR/standards/agents" ]; then
         AGENTS_DIR="$STANDARDS_DIR/standards/agents"
@@ -20,7 +20,7 @@ sync_ai_agents() {
     else
         return
     fi
-    
+
     # Sync GitHub Copilot
     if [ -f "$AGENTS_DIR/copilot/.github/copilot-instructions.md" ]; then
         if [ ! -f "$PROJECT_ROOT/.github/copilot-instructions.md" ]; then
@@ -41,7 +41,7 @@ sync_ai_agents() {
             fi
         fi
     fi
-    
+
     # Sync Aider (Claude Code)
     if [ -f "$AGENTS_DIR/aider/.aiderrc" ]; then
         if [ ! -f "$PROJECT_ROOT/.aiderrc" ]; then
@@ -58,7 +58,7 @@ sync_ai_agents() {
             fi
         fi
     fi
-    
+
     # Sync OpenAI Codex
     if [ -f "$AGENTS_DIR/codex/.codexrc" ]; then
         if [ ! -f "$PROJECT_ROOT/.codexrc" ]; then
@@ -101,12 +101,11 @@ sync_ai_agents() {
     fi
 
     # Sync Gemini CLI & Antigravity
-    if [ -d "$STANDARDS_DIR/.gemini" ]; then
+    local GEMINI_SOURCE=""
+    if [ -n "$STANDARDS_DIR" ] && [ -d "$STANDARDS_DIR/.gemini" ]; then
         GEMINI_SOURCE="$STANDARDS_DIR/.gemini"
     elif [ -d "$SCRIPT_DIR/../.gemini" ]; then
         GEMINI_SOURCE="$SCRIPT_DIR/../.gemini"
-    else
-        GEMINI_SOURCE=""
     fi
 
     if [ -n "$GEMINI_SOURCE" ] && [ -d "$GEMINI_SOURCE" ]; then
@@ -130,7 +129,7 @@ sync_ai_agents() {
         # Sync settings.json
         if [ -f "$GEMINI_SOURCE/settings.json" ]; then
             # Validate JSON syntax before copying
-            JSON_VALID=true
+            local JSON_VALID=true
             if command -v python3 >/dev/null 2>&1; then
                 if ! python3 -m json.tool "$GEMINI_SOURCE/settings.json" >/dev/null 2>&1; then
                     echo "⚠️  Invalid JSON in Gemini settings.json, skipping update..."
@@ -170,13 +169,13 @@ if [ -d "$PROJECT_ROOT/.standards" ]; then
     STANDARDS_DIR="$PROJECT_ROOT/.standards"
     CURSORRULES_SOURCE="$STANDARDS_DIR/.cursorrules"
     echo "📋 Found standards submodule at .standards"
-    
+
     # Update submodule
     cd "$STANDARDS_DIR"
     LOCAL=$(git rev-parse HEAD)
     git fetch origin >/dev/null 2>&1
     REMOTE=$(git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null)
-    
+
     if [ "$LOCAL" != "$REMOTE" ] && [ -n "$REMOTE" ]; then
         echo "📥 Pulling latest standards..."
         git pull origin main 2>/dev/null || git pull origin master 2>/dev/null
@@ -267,7 +266,7 @@ fi
 # Check for new standards files
 if [ -d "$STANDARDS_DIR" ] || [ "$SCRIPT_DIR" = "$PROJECT_ROOT" ]; then
     STANDARDS_FILES_DIR="${STANDARDS_DIR:-$SCRIPT_DIR/..}"
-    
+
     echo ""
     echo "📚 Available standards files:"
     find "$STANDARDS_FILES_DIR/standards" -name "*.md" 2>/dev/null | while read -r file; do
@@ -280,4 +279,3 @@ echo ""
 echo "✅ Sync complete!"
 echo ""
 echo "Note: Restart your IDE/editor to load updated AI agent configurations"
-

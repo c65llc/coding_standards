@@ -12,7 +12,7 @@ This project follows comprehensive development standards. Reference these docume
 - `standards/shared/core-standards.md` - Shared core standards
 
 ### Language-Specific Standards
-- `standards/languages/03_python_standards.md` - Python (poetry/uv, black, ruff, mypy, pytest)
+- `standards/languages/03_python_standards.md` - Python (uv, ruff, mypy, pytest)
 - `standards/languages/04_java_standards.md` - Java (Gradle/Maven, Java 17+, JUnit 5)
 - `standards/languages/05_kotlin_standards.md` - Kotlin (Gradle, ktlint, detekt, MockK)
 - `standards/languages/06_swift_standards.md` - Swift (SPM, swiftformat, XCTest)
@@ -117,6 +117,4 @@ When helping with pull requests:
 - Verify test coverage
 - Ensure documentation is updated
 - Validate architecture layer dependencies
-
-
 

@@ -63,4 +63,3 @@ standards-sync-*.tmp
 # gh-task CLI state files
 .gh-task-state
 .gh-task.conf
-

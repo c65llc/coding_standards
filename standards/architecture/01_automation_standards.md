@@ -47,7 +47,7 @@ Every project MUST include the following targets in the root `Makefile`:
 
 ### `make fmt`
 * **Goal:** Standardize code style.
-* **Action:** Auto-formats code (Prettier, Black, Rustfmt) across the entire repo.
+* **Action:** Auto-formats code (Prettier, Ruff, Rustfmt) across the entire repo.
 
 ### `make repo-setup`
 * **Goal:** Initialize version control.

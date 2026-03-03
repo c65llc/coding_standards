@@ -139,7 +139,7 @@ Coverage gates MUST be enforced in CI. A PR that drops any module below 95% MUST
 
 ### Package Managers
 
-* **Python:** `poetry` or `uv` for dependency resolution. Lock files committed.
+* **Python:** `uv` for dependency management (preferred over `poetry` or naked `pip`). Lock files committed.
 * **JavaScript/TypeScript:** `pnpm` preferred, `npm` acceptable. Lock files committed.
 * **Rust:** `cargo`. `Cargo.lock` committed for applications, not libraries.
 

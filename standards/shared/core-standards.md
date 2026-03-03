@@ -60,7 +60,7 @@ Strict adherence required. Violations must be justified in code comments.
 - **Comments:** Only "Why", never "What". Self-documenting code preferred.
 - **Line Length:** 100 characters (Python), 120 characters (JS/TS).
 - **Imports:** Grouped (stdlib, third-party, local). Sorted alphabetically within groups.
-- **Formatting:** Enforced via automated tools (Black, Prettier, Rustfmt).
+- **Formatting:** Enforced via automated tools (Ruff, Prettier, Rustfmt).
 
 ### Error Handling
 
@@ -131,7 +131,7 @@ Coverage gates MUST be enforced in CI. A PR that drops coverage below 95% in any
 
 ### Package Managers
 
-- **Python:** `poetry` or `uv` for dependency resolution. Lock files committed.
+- **Python:** `uv` for dependency management (preferred over `poetry` or naked `pip`). Lock files committed.
 - **JavaScript/TypeScript:** `pnpm` preferred, `npm` acceptable. Lock files committed.
 - **Rust:** `cargo`. `Cargo.lock` committed for applications, not libraries.
 

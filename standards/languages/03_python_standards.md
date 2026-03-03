@@ -2,26 +2,28 @@
 
 ## 1. Package Management
 
-* **Tool:** `poetry` or `uv` for dependency management. Lock files committed.
-* **Virtual Environments:** Always use isolated environments. Never install globally.
-* **Requirements:** `pyproject.toml` for modern projects. `requirements.txt` only for legacy compatibility.
+* **Tool:** `uv` for dependency management, virtual environments, and Python version management. Prefer `uv` over `poetry` or naked `pip`. Lock files committed.
+* **Virtual Environments:** Always use isolated environments (`uv venv`). Never install globally.
+* **Requirements:** `pyproject.toml` for all projects. `requirements.txt` only for legacy compatibility.
 
 ## 2. Code Style
 
-* **Formatter:** `black` with line length 100. Run via `make fmt`.
-* **Linter:** `ruff` for fast linting. `pylint` for comprehensive analysis.
+* **Formatter:** `ruff format` with line length 100. Prefer `ruff format` over `black` — it is faster, compatible with Black's style, and consolidates formatting and linting into a single tool. Integrate `ruff format` into the project's standard formatting command (e.g., `make fmt`).
+* **Linter:** `ruff check` for fast, comprehensive linting. Replaces `pylint`, `isort`, `pyflakes`, and `pycodestyle`.
 * **Type Checker:** `mypy` or `pyright` in **strict mode** with zero errors. See Section 4 for full typing requirements.
 
 ### Configuration
 
 ```toml
-[tool.black]
-line-length = 100
-target-version = ['py311']
-
 [tool.ruff]
 line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.ruff.format]
+# Compatible with Black style
 
 [tool.mypy]
 strict = true

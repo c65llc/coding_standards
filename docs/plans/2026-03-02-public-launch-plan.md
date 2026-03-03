@@ -15,6 +15,7 @@
 ### Task 1: Add MIT License
 
 **Files:**
+
 - Create: `LICENSE`
 
 **Step 1: Create LICENSE file**
@@ -55,6 +56,7 @@ git commit -m "chore: add MIT license"
 ### Task 2: Add Code of Conduct
 
 **Files:**
+
 - Create: `CODE_OF_CONDUCT.md`
 
 **Step 1: Create CODE_OF_CONDUCT.md**
@@ -73,11 +75,13 @@ git commit -m "chore: add Contributor Covenant code of conduct"
 ### Task 3: Add CONTRIBUTING.md
 
 **Files:**
+
 - Create: `CONTRIBUTING.md`
 
 **Step 1: Create CONTRIBUTING.md**
 
 Structure:
+
 - Welcome section explaining the project
 - **Reporting Issues** — how to file bugs and feature requests via GitHub Issues
 - **Requesting New Languages/Agents** — use feature request template
@@ -99,11 +103,13 @@ git commit -m "docs: add contributing guide (issues-only + fork-friendly)"
 ### Task 4: Add SECURITY.md
 
 **Files:**
+
 - Create: `SECURITY.md`
 
 **Step 1: Create SECURITY.md**
 
 Structure:
+
 - **Reporting a Vulnerability** — email address or private GitHub security advisory
 - **Scope** — what counts as a security issue (install.sh running arbitrary code, script injection in setup scripts)
 - **Response Timeline** — commit to acknowledging within 48 hours
@@ -122,6 +128,7 @@ git commit -m "docs: add security policy"
 ### Task 5: Add GitHub Issue Templates
 
 **Files:**
+
 - Create: `.github/ISSUE_TEMPLATE/bug_report.yml`
 - Create: `.github/ISSUE_TEMPLATE/feature_request.yml`
 - Create: `.github/ISSUE_TEMPLATE/config.yml`
@@ -129,6 +136,7 @@ git commit -m "docs: add security policy"
 **Step 1: Create bug report template**
 
 Create `.github/ISSUE_TEMPLATE/bug_report.yml` as a YAML form template with fields:
+
 - **Description** (textarea, required) — what happened
 - **Expected behavior** (textarea, required) — what should have happened
 - **Steps to reproduce** (textarea, required)
@@ -139,6 +147,7 @@ Create `.github/ISSUE_TEMPLATE/bug_report.yml` as a YAML form template with fiel
 **Step 2: Create feature request template**
 
 Create `.github/ISSUE_TEMPLATE/feature_request.yml` with fields:
+
 - **Type** (dropdown, required) — New language, New AI agent, Script improvement, Documentation, Other
 - **Description** (textarea, required) — what you'd like
 - **Use case** (textarea, required) — why this would be useful
@@ -147,6 +156,7 @@ Create `.github/ISSUE_TEMPLATE/feature_request.yml` with fields:
 **Step 3: Create config.yml**
 
 Create `.github/ISSUE_TEMPLATE/config.yml`:
+
 ```yaml
 blank_issues_enabled: false
 contact_links:
@@ -167,6 +177,7 @@ git commit -m "chore: add GitHub issue templates"
 ### Task 6: Add CI GitHub Action
 
 **Files:**
+
 - Create: `.github/workflows/ci.yml`
 
 **Step 1: Create CI workflow**
@@ -174,6 +185,7 @@ git commit -m "chore: add GitHub issue templates"
 Create `.github/workflows/ci.yml` that triggers on push to `main` and on PRs:
 
 Jobs:
+
 1. **shellcheck** — runs `shellcheck` on all `.sh` files in `scripts/`
 2. **markdown-lint** — runs `markdownlint` on all `.md` files in `standards/` and `docs/`
 3. **build-website** — `cd website && npm ci && npm run build` (only runs if `website/` exists)
@@ -192,6 +204,7 @@ git commit -m "ci: add shellcheck, markdownlint, and website build checks"
 ### Task 7: Add GitHub Pages Deploy Action
 
 **Files:**
+
 - Create: `.github/workflows/deploy.yml`
 
 **Step 1: Create deploy workflow**
@@ -199,6 +212,7 @@ git commit -m "ci: add shellcheck, markdownlint, and website build checks"
 Create `.github/workflows/deploy.yml` that triggers on push to `main` (only when `website/` files change):
 
 Jobs:
+
 1. **build** — `cd website && npm ci && npm run build`
 2. **deploy** — uses `actions/deploy-pages@v4` to deploy `website/dist/`
 
@@ -218,6 +232,7 @@ git commit -m "ci: add GitHub Pages deployment workflow"
 ### Task 8: Restructure docs directory
 
 **Files:**
+
 - Create: `docs/getting-started/` directory
 - Move: `docs/QUICK_START.md` → `docs/getting-started/quick-start.md` (revise)
 - Move: `docs/SETUP_GUIDE.md` → `docs/getting-started/installation.md` (revise)
@@ -241,6 +256,7 @@ mkdir -p docs/getting-started docs/guides docs/reference
 **Step 2: Move and revise getting-started docs**
 
 Move existing docs to new locations. Revise each to:
+
 - Remove internal jargon, write for first-time visitors
 - Add clear prerequisites
 - Ensure all paths and links are updated
@@ -253,6 +269,7 @@ Move MULTI_AGENT_GUIDE.md and INTEGRATION_GUIDE.md. Add Starlight frontmatter.
 **Step 4: Create new customization guide**
 
 Write `docs/guides/customization.md`:
+
 - How to fork the repo
 - Which files to customize (standards/, .cursorrules, agent configs)
 - How to keep your fork updated from upstream
@@ -261,6 +278,7 @@ Write `docs/guides/customization.md`:
 **Step 5: Create new Cursor commands guide**
 
 Write `docs/guides/cursor-commands.md`:
+
 - Document each command in `.cursor/commands/` (pr.md, review.md, address_feedback.md)
 - Explain how to use them in Cursor
 - Show example workflows
@@ -268,6 +286,7 @@ Write `docs/guides/cursor-commands.md`:
 **Step 6: Create reference docs**
 
 Write three reference files:
+
 - `docs/reference/makefile-targets.md` — document every Make target from the Makefile
 - `docs/reference/scripts.md` — document every script in `scripts/` with usage, flags, examples
 - `docs/reference/agent-configs.md` — explain each agent config format (.cursorrules, copilot-instructions.md, .aiderrc, .codexrc, GEMINI.md)
@@ -288,11 +307,13 @@ git commit -m "docs: restructure documentation for public launch"
 ### Task 9: Overhaul root README.md
 
 **Files:**
+
 - Modify: `README.md`
 
 **Step 1: Rewrite README.md**
 
 New structure:
+
 1. **Title + badges** — project name, MIT license badge, CI badge, GitHub stars badge
 2. **One-line description** — "Unified coding standards for every AI coding assistant."
 3. **Hero paragraph** — 2-3 sentences: what it does, why it matters, who it's for
@@ -321,6 +342,7 @@ git commit -m "docs: overhaul README for public launch"
 ### Task 10: Scaffold Astro Starlight project
 
 **Files:**
+
 - Create: `website/package.json`
 - Create: `website/astro.config.mjs`
 - Create: `website/tsconfig.json`
@@ -336,6 +358,7 @@ npm create astro@latest -- --template starlight --yes
 ```
 
 If the interactive installer doesn't work non-interactively, manually create the files:
+
 - `package.json` with `astro`, `@astrojs/starlight` dependencies
 - `astro.config.mjs` with Starlight plugin configured
 - `tsconfig.json` extending Astro's config
@@ -343,6 +366,7 @@ If the interactive installer doesn't work non-interactively, manually create the
 **Step 2: Configure Starlight**
 
 Edit `website/astro.config.mjs`:
+
 - Set `site` to `https://coding_standards.c65llc.com`
 - Set `title` to `Coding Standards`
 - Configure sidebar to match the docs structure:
@@ -381,21 +405,25 @@ git commit -m "feat: scaffold Astro Starlight website"
 ### Task 11: Wire docs content into Starlight
 
 **Files:**
+
 - Create/modify: `website/src/content/docs/` structure
 - Modify: `website/astro.config.mjs` (if needed for content collections)
 
 **Step 1: Set up content symlinks or copies**
 
 Starlight expects content in `src/content/docs/`. Two approaches:
+
 - **Option A (symlinks):** Symlink `../../docs/getting-started/` etc. into `src/content/docs/`
 - **Option B (build script):** Add a prebuild script that copies docs and standards into `src/content/docs/`
 
 Use Option B (build script) — symlinks can be fragile in CI. Create a `website/scripts/sync-content.sh` that:
+
 1. Copies `docs/getting-started/`, `docs/guides/`, `docs/reference/` into `website/src/content/docs/`
 2. Copies `standards/architecture/`, `standards/languages/`, `standards/process/` into `website/src/content/docs/standards/`
 3. Adds Starlight frontmatter to any files missing it
 
 Update `package.json` scripts:
+
 ```json
 "prebuild": "bash scripts/sync-content.sh",
 "predev": "bash scripts/sync-content.sh"
@@ -425,6 +453,7 @@ git commit -m "feat: wire documentation content into Starlight"
 ### Task 12: Build custom landing page
 
 **Files:**
+
 - Create: `website/src/pages/index.astro`
 - Create: `website/src/components/Hero.astro`
 - Create: `website/src/components/FeatureGrid.astro`
@@ -449,6 +478,7 @@ Use the `frontend-design` skill for this step to ensure high design quality.
 **Step 2: Build each component**
 
 Create each `.astro` component with:
+
 - Scoped CSS (no external CSS framework needed — keep it light)
 - Dark mode as default, with light mode support via Starlight's theme toggle
 - Responsive design (mobile-first)
@@ -474,6 +504,7 @@ git commit -m "feat: add custom landing page with all sections"
 ### Task 13: Add blog support
 
 **Files:**
+
 - Modify: `website/astro.config.mjs`
 - Modify: `website/package.json` (add blog plugin if needed)
 - Create: `website/src/content/docs/blog/` directory
@@ -482,6 +513,7 @@ git commit -m "feat: add custom landing page with all sections"
 **Step 1: Enable Starlight blog**
 
 Install `starlight-blog` plugin:
+
 ```bash
 cd website && npm install starlight-blog
 ```
@@ -491,6 +523,7 @@ Add to `astro.config.mjs` plugins.
 **Step 2: Create welcome blog post**
 
 Write `welcome.md`:
+
 - Title: "Introducing Coding Standards: One Framework, Every AI Agent"
 - Announce the public launch
 - Explain the problem and solution
@@ -515,11 +548,13 @@ git commit -m "feat: add blog with welcome post"
 ### Task 14: Add "Why This?" comparison page
 
 **Files:**
+
 - Create: `website/src/content/docs/why.md`
 
 **Step 1: Write comparison page**
 
 Structure:
+
 - **The Problem** — Teams use multiple AI agents, each generates code differently
 - **The Old Way** — Maintain separate configs per agent, standards drift, no single source of truth
 - **The New Way** — One standards repo, auto-synced to every agent
@@ -538,6 +573,7 @@ git commit -m "docs: add 'Why This?' comparison page"
 ### Task 15: Add OG image and meta tags
 
 **Files:**
+
 - Create: `website/public/og-image.png`
 - Modify: `website/astro.config.mjs` (social/head config)
 
@@ -548,6 +584,7 @@ Create a 1200x630 PNG for social sharing. Can be a simple branded image with the
 **Step 2: Configure meta tags**
 
 Update `astro.config.mjs` to include:
+
 - `head` entries for og:image, og:title, og:description, twitter:card
 - Set `social` links (GitHub repo URL)
 
@@ -565,12 +602,14 @@ git commit -m "feat: add OG image and social meta tags"
 ### Task 16: Update .gitignore for website
 
 **Files:**
+
 - Modify: `.gitignore`
 
 **Step 1: Add website build artifacts to .gitignore**
 
 Add:
-```
+
+```text
 # Website
 website/node_modules/
 website/dist/
@@ -595,11 +634,13 @@ git commit -m "chore: update .gitignore for website build artifacts"
 ### Task 17: Update Makefile with website targets
 
 **Files:**
+
 - Modify: `Makefile`
 
 **Step 1: Add website targets**
 
 Add to the existing Makefile:
+
 ```makefile
 website-dev: ## Start the website dev server
 	@cd website && npm run dev
@@ -657,6 +698,7 @@ cd website && npm run dev
 ```
 
 Open browser and verify:
+
 - Landing page renders all sections
 - Docs sidebar navigates correctly
 - All standards pages render
@@ -678,6 +720,7 @@ Add a CNAME record for `coding_standards.c65llc.com` pointing to `c65llc.github.
 **Step 2: Enable GitHub Pages**
 
 In the repo settings on GitHub:
+
 - Go to Settings → Pages
 - Source: GitHub Actions
 - Custom domain: `coding_standards.c65llc.com`
@@ -714,6 +757,7 @@ Push to `main` and verify the deploy workflow runs. Check `coding_standards.c65l
 | 19 | Configure DNS + GitHub Pages | Polish | 10 min |
 
 **Dependencies:**
+
 - Tasks 1-7 can be done in parallel (no dependencies)
 - Task 8 must complete before Task 11 (docs need to exist before wiring into Starlight)
 - Task 10 must complete before Tasks 11-15

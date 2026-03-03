@@ -79,12 +79,11 @@ setup_ai_agents() {
     fi
 
     # Setup Gemini CLI & Antigravity
-    if [ -d "$STANDARDS_DIR/.gemini" ]; then
+    local GEMINI_SOURCE=""
+    if [ -n "$STANDARDS_DIR" ] && [ -d "$STANDARDS_DIR/.gemini" ]; then
         GEMINI_SOURCE="$STANDARDS_DIR/.gemini"
     elif [ -d "$SCRIPT_DIR/../.gemini" ]; then
         GEMINI_SOURCE="$SCRIPT_DIR/../.gemini"
-    else
-        GEMINI_SOURCE=""
     fi
 
     if [ -n "$GEMINI_SOURCE" ] && [ -d "$GEMINI_SOURCE" ]; then

@@ -139,8 +139,3 @@ standards/
 3. Update setup/sync scripts
 4. Update documentation
 5. Test with multiple agents
-
-
-
-
-

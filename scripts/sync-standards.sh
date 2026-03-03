@@ -101,12 +101,11 @@ sync_ai_agents() {
     fi
 
     # Sync Gemini CLI & Antigravity
-    if [ -d "$STANDARDS_DIR/.gemini" ]; then
+    local GEMINI_SOURCE=""
+    if [ -n "$STANDARDS_DIR" ] && [ -d "$STANDARDS_DIR/.gemini" ]; then
         GEMINI_SOURCE="$STANDARDS_DIR/.gemini"
     elif [ -d "$SCRIPT_DIR/../.gemini" ]; then
         GEMINI_SOURCE="$SCRIPT_DIR/../.gemini"
-    else
-        GEMINI_SOURCE=""
     fi
 
     if [ -n "$GEMINI_SOURCE" ] && [ -d "$GEMINI_SOURCE" ]; then
@@ -130,7 +129,7 @@ sync_ai_agents() {
         # Sync settings.json
         if [ -f "$GEMINI_SOURCE/settings.json" ]; then
             # Validate JSON syntax before copying
-            JSON_VALID=true
+            local JSON_VALID=true
             if command -v python3 >/dev/null 2>&1; then
                 if ! python3 -m json.tool "$GEMINI_SOURCE/settings.json" >/dev/null 2>&1; then
                     echo "⚠️  Invalid JSON in Gemini settings.json, skipping update..."

@@ -49,7 +49,7 @@ Make the coding_standards repository publicly available with collaboration featu
 
 ### Restructured `docs/` directory
 
-```
+```text
 docs/
 ├── getting-started/
 │   ├── quick-start.md          # 5-minute setup
@@ -94,7 +94,7 @@ docs/
 
 ### Directory structure
 
-```
+```text
 website/
 ├── astro.config.mjs
 ├── package.json

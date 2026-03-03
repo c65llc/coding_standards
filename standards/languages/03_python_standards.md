@@ -8,7 +8,7 @@
 
 ## 2. Code Style
 
-* **Formatter:** `ruff format` with line length 100. Run via `make fmt`. Prefer `ruff format` over `black` — it is faster, compatible with Black's style, and consolidates formatting and linting into a single tool.
+* **Formatter:** `ruff format` with line length 100. Prefer `ruff format` over `black` — it is faster, compatible with Black's style, and consolidates formatting and linting into a single tool. Integrate `ruff format` into the project's standard formatting command (e.g., `make fmt`).
 * **Linter:** `ruff check` for fast, comprehensive linting. Replaces `pylint`, `isort`, `pyflakes`, and `pycodestyle`.
 * **Type Checker:** `mypy` or `pyright` in **strict mode** with zero errors. See Section 4 for full typing requirements.
 

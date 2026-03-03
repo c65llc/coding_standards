@@ -1,110 +1,61 @@
-# [Project Name] — Claude Code Guide
+# CLAUDE.md
 
-## Project Summary
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-[One paragraph describing what this project does, its primary use case, and key technologies.]
+## Project Overview
 
----
+This is a **coding standards repository** — a collection of reusable development standards and AI agent configurations designed to be installed into other projects (via git submodule or direct clone). It is not an application; it contains Markdown standards documents, bash scripts, and agent config files.
 
 ## Key Commands
 
 ```bash
-make check          # Compile/type-check all targets
-make lint           # Run linters (warnings are errors)
-make test           # Unit + integration tests
-make ci             # Full pipeline: check → fmt → lint → test
-make fmt            # Auto-format code
-make ls             # List all make targets with descriptions
+make help                    # Show all available targets
+make test-scripts            # Validate bash script syntax (setup.sh, sync-standards.sh)
+make lint                    # Lint markdown files (requires markdownlint)
+make format                  # Format markdown files (requires prettier)
+make setup                   # Run setup script to configure standards in a project
+make sync-standards          # Sync standards files and update .cursorrules
+make setup-agents            # Setup AI agent configurations
+make add-copilot-instructions # Create PR to add Copilot instructions
 ```
 
-Package-scoped testing (if applicable):
-```bash
-# cargo test -p my-package     (Rust)
-# pnpm --filter my-package test (Node)
-```
+There are no build steps, no test suites, and no application to run. The primary "tests" are `bash -n` syntax checks on shell scripts.
 
----
+## Architecture
 
-## Workspace Layout
+### Standards Documents (`standards/`)
 
-```
-apps/                # Deployable applications
-packages/            # Shared libraries (dependency direction: inward only)
-tools/               # Build scripts, generators, dev tools
-docs/                # Architecture docs, ADRs, development guides
-  adr/               # Architecture Decision Records
-```
+14 numbered Markdown files organized by category:
+- `architecture/` (00-02): Core architecture, automation standards, Cursor-specific automation
+- `languages/` (03-11): Python, Java, Kotlin, Swift, Dart, TypeScript, JavaScript, Rust, Zig
+- `process/` (12-14): Documentation, git/version control, code review
+- `shared/core-standards.md`: Canonical source of cross-cutting standards (Clean Architecture, SOLID, naming, testing coverage targets). All agent configs reference this file.
 
----
+### Agent Configurations (`standards/agents/`)
 
-## Architecture Rules
+Template configs deployed to consumer projects during setup:
+- `copilot/.github/copilot-instructions.md` — GitHub Copilot
+- `aider/.aiderrc` — Aider (Claude Code)
+- `codex/.codexrc` — OpenAI Codex
+- Gemini CLI config lives at `.gemini/` (root level, per Gemini convention)
 
-### Dependency Direction
-- Inner layers have zero knowledge of outer layers.
-- Apps depend on packages. Packages never depend on apps.
-- **Never add an inward→outward dependency.**
+### Scripts (`scripts/`)
 
-### [Project-Specific Invariants]
-- [Document critical invariants here, e.g., "All offsets are char-based, not byte-based"]
-- [Include concrete examples of how invariants break]
+All bash. Key scripts:
+- `setup.sh` — Installs standards into a target project, detects and configures AI agents
+- `sync-standards.sh` — Pulls latest standards and updates agent configs in consumer projects
+- `add-copilot-instructions-pr.sh` — Creates a PR to add Copilot instructions to a repo
+- `setup-git-aliases.sh` — Configures git aliases
 
----
+### Installation Flow
 
-## Error Handling
+`install.sh` (root) is the one-line curl installer. It adds this repo as a `.standards/` submodule in the target project, runs `setup.sh` to configure agents, and adds a `make sync-standards` target.
 
-- **Libraries:** Typed error enums. Use `Result<T, E>` for all fallible operations.
-- **Apps:** Contextual error wrappers for debugging.
-- **UI event handlers:** Log and continue. Never panic on expected errors.
+## Conventions
 
----
-
-## Testing
-
-- **Structure:** Inline test modules within source files. Integration tests in `tests/` directory.
-- **Coverage baselines:**
-
-| Layer | Min Coverage |
-|-------|-------------|
-| Core / Domain | 100% |
-| Application / Shell | 95% |
-| Infrastructure | 95% |
-
----
-
-## Key Source Files
-
-| File | Purpose |
-|------|---------|
-| [path/to/main/module] | [Brief description] |
-| [path/to/core/types] | [Brief description] |
-
----
-
-## Commit Message Format
-
-Follow Conventional Commits: `type(scope): subject`
-
-**Types:** `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `ci`, `build`
-**Scope:** module name or area
-
----
-
-## What NOT To Do
-
-- [Anti-pattern 1: describe what to avoid and why]
-- [Anti-pattern 2: describe what to avoid and why]
-- Do not modify the root checkout from an automated agent session — use a git worktree.
-
----
-
-## Agent Workflow — Worktree Requirement
-
-**All agent-based development work MUST be completed in a git worktree.**
-
-```bash
-git worktree add .claude/worktrees/<branch-name> -b <branch-name>
-cd .claude/worktrees/<branch-name>
-# Work here. Run make ci before considering work complete.
-```
-
-Never modify files in the root checkout from an automated agent session.
+- **Standards numbering**: Files are numbered 00-14. Preserve this numbering scheme when adding new standards.
+- **Conventional Commits**: `type(scope): subject` — types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`, `ci`
+- **Temporary files**: Go in `.standards_tmp/` (gitignored).
+- **Agent config consistency**: When modifying shared standards in `core-standards.md`, check that agent configs (`.cursorrules`, copilot-instructions.md, `.aiderrc`, `.codexrc`, `GEMINI.md`) stay aligned.
+- **Shell scripts**: Must pass `bash -n` syntax validation.
+- **Safety**: Never modify `.standards_tmp/`, `.secret`, or `.tfstate` files. Always preserve standards file numbering. Update `.cursorrules` when adding new standards.

@@ -1,0 +1,4 @@
+# Zig permissions
+Bash(zig build*)
+Bash(zig test*)
+Bash(zig fmt*)

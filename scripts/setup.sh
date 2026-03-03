@@ -68,10 +68,57 @@ setup_ai_agents() {
         fi
         if [ ! -f "$PROJECT_ROOT/.claude/settings.json" ]; then
             mkdir -p "$PROJECT_ROOT/.claude"
-            if cp "$AGENTS_DIR/claude-code/settings.json.example" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null; then
-                echo "✅ Claude Code settings installed at .claude/settings.json"
+            # Detect project languages and build language-aware settings
+            local DETECT_SCRIPT="$SCRIPT_DIR/detect-languages.sh"
+            local BUILD_SCRIPT="$SCRIPT_DIR/build-claude-settings.sh"
+            local BASE_SETTINGS="$AGENTS_DIR/claude-code/settings.json.example"
+            local PERMS_DIR="$AGENTS_DIR/claude-code/permissions"
+
+            if [ -x "$DETECT_SCRIPT" ] && [ -x "$BUILD_SCRIPT" ] && [ -d "$PERMS_DIR" ]; then
+                local DETECTED_LANGS
+                DETECTED_LANGS=$("$DETECT_SCRIPT" "$PROJECT_ROOT")
+                if [ -n "$DETECTED_LANGS" ]; then
+                    # shellcheck disable=SC2086
+                    if "$BUILD_SCRIPT" "$BASE_SETTINGS" "$PERMS_DIR" $DETECTED_LANGS > "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null; then
+                        echo "✅ Claude Code settings installed at .claude/settings.json"
+                        echo "   Detected languages: $(echo $DETECTED_LANGS | tr '\n' ' ')"
+                    else
+                        echo "⚠️  Failed to build language-aware settings, using base template..."
+                        cp "$BASE_SETTINGS" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null
+                    fi
+                else
+                    if cp "$BASE_SETTINGS" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null; then
+                        echo "✅ Claude Code settings installed at .claude/settings.json (no languages detected)"
+                    else
+                        echo "⚠️  Failed to install Claude Code settings (non-fatal, continuing...)"
+                    fi
+                fi
             else
-                echo "⚠️  Failed to install Claude Code settings (non-fatal, continuing...)"
+                # Fallback: scripts not available, use base template
+                if cp "$BASE_SETTINGS" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null; then
+                    echo "✅ Claude Code settings installed at .claude/settings.json"
+                else
+                    echo "⚠️  Failed to install Claude Code settings (non-fatal, continuing...)"
+                fi
+            fi
+
+            # Copy language-specific tool configs
+            if [ -n "$DETECTED_LANGS" ]; then
+                for lang in $DETECTED_LANGS; do
+                    local LANG_CONFIG_DIR="$AGENTS_DIR/$lang"
+                    if [ -d "$LANG_CONFIG_DIR" ]; then
+                        for config_file in "$LANG_CONFIG_DIR"/*; do
+                            [ -f "$config_file" ] || continue
+                            local config_name
+                            config_name="$(basename "$config_file")"
+                            if [ ! -f "$PROJECT_ROOT/$config_name" ]; then
+                                if cp "$config_file" "$PROJECT_ROOT/$config_name" 2>/dev/null; then
+                                    echo "   ✅ Installed $config_name ($lang)"
+                                fi
+                            fi
+                        done
+                    fi
+                done
             fi
         else
             echo "ℹ️  .claude/settings.json already exists, skipping"

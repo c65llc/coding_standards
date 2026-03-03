@@ -1,0 +1,10 @@
+# Rust permissions
+Bash(cargo test*)
+Bash(cargo check*)
+Bash(cargo clippy*)
+Bash(cargo fmt*)
+Bash(cargo build*)
+Bash(cargo run*)
+Bash(cargo audit*)
+Bash(cargo deny*)
+Bash(cargo doc*)

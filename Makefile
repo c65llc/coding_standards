@@ -58,6 +58,10 @@ test-scripts: ## Test setup and sync scripts
 	@bash -n scripts/setup.sh && echo "✅ setup.sh syntax valid"
 	@echo "Testing sync-standards.sh..."
 	@bash -n scripts/sync-standards.sh && echo "✅ sync-standards.sh syntax valid"
+	@echo "Testing detect-languages.sh..."
+	@bash -n scripts/detect-languages.sh && echo "✅ detect-languages.sh syntax valid"
+	@echo "Testing build-claude-settings.sh..."
+	@bash -n scripts/build-claude-settings.sh && echo "✅ build-claude-settings.sh syntax valid"
 	@echo "Testing gh-task..."
 	@bash -n bin/gh-task && echo "✅ gh-task syntax valid"
 

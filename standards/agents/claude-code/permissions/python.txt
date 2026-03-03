@@ -1,0 +1,10 @@
+# Python permissions
+Bash(python *)
+Bash(python3 *)
+Bash(uv *)
+Bash(ruff *)
+Bash(pytest *)
+Bash(mypy *)
+Bash(pyright *)
+Bash(bandit *)
+Bash(pip-audit *)

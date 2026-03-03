@@ -1,0 +1,9 @@
+# Ruby permissions
+Bash(bundle *)
+Bash(bundle exec *)
+Bash(rubocop *)
+Bash(rspec *)
+Bash(brakeman *)
+Bash(bundle-audit *)
+Bash(rails *)
+Bash(rake *)

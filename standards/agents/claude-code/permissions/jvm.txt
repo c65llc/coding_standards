@@ -1,0 +1,5 @@
+# JVM (Java/Kotlin/Scala) permissions
+Bash(gradle *)
+Bash(./gradlew *)
+Bash(mvn *)
+Bash(./mvnw *)

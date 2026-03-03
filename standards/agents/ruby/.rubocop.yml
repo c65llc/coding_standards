@@ -4,6 +4,7 @@ require:
   - rubocop-performance
 
 AllCops:
+  TargetRubyVersion: 3.2
   TargetRailsVersion: 7.2
   NewCops: enable
   SuggestExtensions: false
@@ -32,7 +33,7 @@ Style/AsciiComments:
 Style/GlobalVars:
   AllowedVariables: [$redis]
 Style/HashSyntax:
-  EnforcedShorthandSyntax: never
+  Enabled: false
 
 Layout/LineLength:
   AllowedPatterns:
@@ -77,8 +78,19 @@ Layout/ClassStructure:
       - validate
       - validates
       - validates_each
+      - validates_with
       - validates_presence_of
       - validates_uniqueness_of
+      - validates_acceptance_of
+      - validates_confirmation_of
+      - validates_exclusion_of
+      - validates_inclusion_of
+      - validates_length_of
+      - validates_numericality_of
+      - validates_format_of
+      - validates_associated
+      - validates_absence_of
+      - validates_size_of
     nested_attributes:
       - accepts_nested_attributes_for
     hooks:

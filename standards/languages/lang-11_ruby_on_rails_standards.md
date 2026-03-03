@@ -76,6 +76,8 @@ class User < ApplicationRecord
 
   # 4. Attributes
   attribute :preferences, :jsonb, default: {}
+
+  sig { returns(T.nilable(T::Boolean)) }
   attr_accessor :skip_welcome_email
 
   # 5. Enums
@@ -97,7 +99,6 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :profile, update_only: true
 
   # 9. Scopes
-  scope :active, -> { where(status: :active) }
   scope :admins, -> { where(role: :admin) }
   scope :recently_active, -> { where(last_sign_in_at: 30.days.ago..) }
   scope :searchable, -> { active.where.not(confirmed_at: nil) }
@@ -127,11 +128,6 @@ class User < ApplicationRecord
   sig { returns(String) }
   def display_name
     name.presence || email.split("@").first
-  end
-
-  sig { returns(T::Boolean) }
-  def admin?
-    role == "admin"
   end
 
   sig { returns(T::Boolean) }
@@ -215,7 +211,7 @@ class UsersController < ApplicationController
   def index
     @users = T.let(
       User.active.order(created_at: :desc).page(params[:page]),
-      T.nilable(T.untyped),
+      T.nilable(User::ActiveRecord_Relation),
     )
   end
 
@@ -302,8 +298,8 @@ class CreateUser
 
   sig { params(params: T::Hash[Symbol, T.untyped], created_by: User).void }
   def initialize(params:, created_by:)
-    @params = params
-    @created_by = created_by
+    @params = T.let(params, T::Hash[Symbol, T.untyped])
+    @created_by = T.let(created_by, User)
   end
 
   sig { returns(Result) }
@@ -534,7 +530,7 @@ Key Rails-specific RuboCop decisions for this project. Reference `standards/agen
 
 # Never enforce hash rocket vs. symbol style -- allow both
 Style/HashSyntax:
-  Enabled: never
+  Enabled: false
 
 # Do not count hash/method_call lines toward method length
 Metrics/MethodLength:

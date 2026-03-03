@@ -45,7 +45,8 @@ This document explains the repository layout so you can find what you need quick
 │   ├── process/                    # Process and workflow standards
 │   │   ├── proc-01_documentation_standards.md
 │   │   ├── proc-02_git_version_control_standards.md
-│   │   └── proc-03_code_review_expectations.md
+│   │   ├── proc-03_code_review_expectations.md
+│   │   └── proc-04_agent_workflow_standards.md
 │   │
 │   ├── shared/                     # Shared standards for all agents
 │   │   └── core-standards.md
@@ -95,7 +96,7 @@ Standards are organized by category so you only look at what applies:
 | -------- | ---- | ------- |
 | Architecture | `standards/architecture/` | Clean Architecture, automation, Cursor integration |
 | Languages | `standards/languages/` | Python, Java, Kotlin, Swift, Dart, TypeScript, JavaScript, Rust, Zig, Ruby, Ruby on Rails |
-| Process | `standards/process/` | Documentation, git workflow, code review |
+| Process | `standards/process/` | Documentation, git workflow, code review, agent workflow |
 | Shared | `standards/shared/` | Core standards that apply across all agents |
 | Agent configs | `standards/agents/` | Templates for each AI agent |
 

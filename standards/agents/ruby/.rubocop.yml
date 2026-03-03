@@ -10,10 +10,10 @@ AllCops:
   Exclude:
     - 'db/schema.rb'
     - 'db/migrate/**/*'
+    - 'db/migrate/**/*'
     - 'config/secrets/**/*'
     - 'script/**/*'
     - 'bin/{rails,rake}'
-
 Rails/UnknownEnv:
   Environments: [development, test, staging, demo, production]
 Rails/SafeNavigation:

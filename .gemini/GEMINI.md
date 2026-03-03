@@ -102,11 +102,11 @@ When working with this repository, agents must follow the A-P-E (Analyze, Plan, 
 
 ## 📚 Key Standards Files
 
-- **Architecture:** `standards/architecture/00_project_standards_and_architecture.md`
-- **Automation:** `standards/architecture/01_automation_standards.md`
-- **Cursor Integration:** `standards/architecture/02_cursor_automation_standards.md`
-- **Language Standards:** `standards/languages/03_python_standards.md` through `11_zig_standards.md`
-- **Process Standards:** `standards/process/12_documentation_standards.md` through `14_code_review_expectations.md`
+- **Architecture:** `standards/architecture/arch-01_project_standards_and_architecture.md`
+- **Automation:** `standards/architecture/arch-02_automation_standards.md`
+- **Cursor Integration:** `standards/architecture/arch-03_cursor_automation_standards.md`
+- **Language Standards:** `standards/languages/lang-01_python_standards.md` through `lang-09_zig_standards.md`
+- **Process Standards:** `standards/process/proc-01_documentation_standards.md` through `proc-03_code_review_expectations.md`
 
 ## 🔗 Integration Points
 
@@ -120,7 +120,7 @@ When working with this repository, agents must follow the A-P-E (Analyze, Plan, 
 When starting work on this repository:
 
 1. Read `.gemini/GEMINI.md` (this file) to understand architecture and constraints
-2. Review `standards/architecture/00_project_standards_and_architecture.md` for core principles
+2. Review `standards/architecture/arch-01_project_standards_and_architecture.md` for core principles
 3. Check `.cursorrules` for Cursor AI integration patterns
 4. Use checkpointing via Gemini CLI before attempting any refactors
 5. Do not proceed with multi-file edits without first outputting a 'Proposed Logic Plan'

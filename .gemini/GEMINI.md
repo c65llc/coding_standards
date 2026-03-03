@@ -92,7 +92,7 @@ When working with this repository, agents must follow the A-P-E (Analyze, Plan, 
   - Files ending in `.secret` or `.tfstate`
   - Git history or commit messages (unless explicitly requested)
 - **Always preserve:**
-  - Existing standards file numbering (e.g., `00_`, `01_`, `02_`)
+  - Existing standards file naming (e.g., `arch-01_`, `lang-01_`, `proc-01_`)
   - Directory structure and organization
   - Backward compatibility for existing integrations
 - **Always update:**

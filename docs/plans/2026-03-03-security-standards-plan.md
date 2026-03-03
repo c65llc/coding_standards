@@ -1,7 +1,5 @@
 # Security Guidelines Framework Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
-
 **Goal:** Add a P0-P3 severity-based security standards framework that prevents critical vulnerabilities in AI-generated code and catches them during automated code review.
 
 **Architecture:** One central security standards document (`standards/security/sec-01_security_standards.md`) with P0-P3 tagged rules covering injection, auth, secrets, dangerous functions, supply chain, config, and data protection. All agent configs get security violation detection rules. Core-standards and code review expectations are updated to reference the new framework. Language standards get brief security addenda with language-specific tooling.

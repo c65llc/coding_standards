@@ -30,7 +30,7 @@ This project follows comprehensive development standards. Reference these docume
 - `standards/process/proc-03_code_review_expectations.md` - Code review process and expectations
 
 ### Security Standards
-- `standards/security/sec-01_security_standards.md` - Security guidelines with P0-P3 severity model
+- `standards/security/sec-01_security_standards.md` - Security guidelines with P0-P2 severity model
 
 ## Non-Negotiable Requirements
 

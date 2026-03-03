@@ -299,6 +299,7 @@ rustflags = ['--cfg', 'getrandom_backend="custom"']
 
 > Full security standards: `standards/security/sec-01_security_standards.md`
 
+- **SAST:** Run `cargo clippy --all-targets --all-features -- -D warnings` in CI. Use `cargo-geiger` to audit `unsafe` usage across dependencies.
 - **Dependency scanning:** Run `cargo audit` and `cargo deny check` in CI.
 - **Unsafe code:** Minimize `unsafe` blocks. Document safety invariants for every `unsafe` usage. Prefer safe abstractions.
 - **Secure random:** Use `rand::rngs::OsRng` or `getrandom` crate for cryptographic randomness.

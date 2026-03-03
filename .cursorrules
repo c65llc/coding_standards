@@ -30,7 +30,7 @@ Reference and strictly follow these documents when making any changes:
    - `standards/process/proc-03_code_review_expectations.md` - Code review process and expectations
 
 4. **Security Standards:**
-   - `standards/security/sec-01_security_standards.md` - Security guidelines with P0-P3 severity model
+   - `standards/security/sec-01_security_standards.md` - Security guidelines with P0-P2 severity model
 
 ## Non-Negotiable Requirements
 

@@ -289,7 +289,7 @@ end
 
 > Full security standards: `standards/security/sec-01_security_standards.md`
 
-- **SAST:** Run `brakeman --no-pager` in CI for Rails apps. Use `rubocop-security` rules.
+- **SAST:** Use `rubocop-security` rules for all Ruby projects. For Rails apps, also run `brakeman --no-pager` in CI.
 - **Dependency scanning:** Run `bundle-audit check --update` in CI.
 - **Secrets scanning:** Use `detect-secrets` as a pre-commit hook.
 - **Banned functions:** `eval()`, `send()` with user input, `system()` with interpolation, `Marshal.load()` (untrusted), `YAML.load()` (use `YAML.safe_load`).

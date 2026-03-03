@@ -197,7 +197,7 @@ Example: `feat(domain): add user email validation`
 
 > Full security standards with code examples: `standards/security/sec-01_security_standards.md`
 >
-> Severity model: **P0** (Critical) and **P1** (High) findings block merge. **P2** (Medium) are warnings. **P3** (Low) are informational.
+> Severity model: **P0** (Critical) and **P1** (High) findings block merge. **P2** (Medium) are warnings.
 
 ### P0 — Critical (Must Block Merge)
 
@@ -231,9 +231,16 @@ Example: `feat(domain): add user email validation`
 
 ### Dependency Security
 
-- Regular security audits (`npm audit`, `cargo audit`, `pip-audit`, `bundle-audit`).
+- Regular security audits (`pnpm audit`, `npm audit`, `cargo audit`, `pip-audit`, `bundle-audit`).
 - Automated vulnerability scanning in CI/CD.
 - Patch critical vulnerabilities immediately.
+
+### P2 — Medium (Flag as Warning)
+
+- Missing rate limiting on public-facing endpoints.
+- Verbose error messages exposing internal details in production.
+- Unpinned dependency versions.
+- Missing encryption at rest for sensitive data.
 
 ## Language-Specific Standards
 

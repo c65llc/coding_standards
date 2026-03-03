@@ -1,7 +1,7 @@
 # Security Standards
 
-> **Severity Model:** Rules are tagged P0 (Critical), P1 (High), P2 (Medium), or P3 (Low).
-> P0 and P1 findings **must block merge**. P2 findings should be flagged as warnings. P3 findings are informational.
+> **Severity Model:** Rules are tagged P0 (Critical), P1 (High), or P2 (Medium).
+> P0 and P1 findings **must block merge**. P2 findings should be flagged as warnings.
 >
 > This framework is inspired by [Omar Gate](https://github.com/marketplace/actions/omar-gate)'s multi-layer security analysis model.
 
@@ -173,7 +173,7 @@ Never use these functions with untrusted input. If used with trusted input, add 
 |----------|-----------------|
 | Python | `eval()`, `exec()`, `pickle.loads()` (untrusted), `yaml.load()` (use `safe_load`), `os.system()`, `subprocess.call(..., shell=True)` |
 | JavaScript/TypeScript | `eval()`, `Function()`, `setTimeout(string)`, `setInterval(string)`, `document.write()` |
-| Ruby | `eval()`, `send()` with user input, `system()` with interpolation, `Marshal.load()` (untrusted), `YAML.load()` (use `safe_load`) |
+| Ruby | `eval()`, `send()` with user input, `system()` with interpolation, `Marshal.load()` (untrusted), `YAML.load()` (use `YAML.safe_load`) |
 | Java/Kotlin | `Runtime.exec()` with string, `ObjectInputStream.readObject()` (untrusted), `ScriptEngine.eval()` |
 | Rust | `std::process::Command` with unsanitized input |
 | Swift | `NSExpression` with user input, `Process` with unsanitized args |
@@ -205,7 +205,7 @@ Never use these functions with untrusted input. If used with trusted input, add 
 | Language | Tool |
 |----------|------|
 | Python | `pip-audit`, `safety` |
-| JavaScript/TypeScript | `npm audit`, `yarn audit` |
+| JavaScript/TypeScript | `pnpm audit`, `npm audit`, `yarn audit` |
 | Ruby | `bundler-audit` (`bundle-audit` command) |
 | Java/Kotlin | OWASP Dependency-Check, `gradle dependencyCheckAnalyze` |
 | Rust | `cargo audit`, `cargo deny` |
@@ -296,7 +296,7 @@ logger.info("User login", extra={"username": username})
 | JavaScript/TypeScript | `eslint-plugin-security` | Add to ESLint config |
 | Ruby | `brakeman` | `brakeman --no-pager` |
 | Java/Kotlin | SpotBugs + Find Security Bugs | Gradle/Maven plugin |
-| Rust | `cargo-geiger` (unsafe audit), `clippy` | `cargo geiger`, `cargo clippy` |
+| Rust | `cargo-geiger` (unsafe audit), `clippy` | `cargo geiger`, `cargo clippy --all-targets --all-features -- -D warnings` |
 | Swift | — | Use Xcode static analyzer |
 | Dart | `dart analyze` | Built-in security rules |
 

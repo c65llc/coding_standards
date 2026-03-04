@@ -1,0 +1,6 @@
+# Swift permissions
+Bash(swift build*)
+Bash(swift test*)
+Bash(swift package *)
+Bash(swiftlint *)
+Bash(swiftformat *)

@@ -93,10 +93,75 @@ sync_ai_agents() {
             if [ -f "$AGENTS_DIR/claude-code/settings.json.example" ]; then
                 echo "📝 Adding Claude Code settings..."
                 mkdir -p "$PROJECT_ROOT/.claude"
-                if cp "$AGENTS_DIR/claude-code/settings.json.example" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null; then
+                # Detect project languages and build language-aware settings
+                local DETECT_SCRIPT=""
+                local BUILD_SCRIPT=""
+                if [ -n "$STANDARDS_DIR" ]; then
+                    DETECT_SCRIPT="$STANDARDS_DIR/scripts/detect-languages.sh"
+                    BUILD_SCRIPT="$STANDARDS_DIR/scripts/build-claude-settings.sh"
+                fi
+                [ ! -x "$DETECT_SCRIPT" ] && DETECT_SCRIPT="$SCRIPT_DIR/detect-languages.sh"
+                [ ! -x "$BUILD_SCRIPT" ] && BUILD_SCRIPT="$SCRIPT_DIR/build-claude-settings.sh"
+
+                local BASE_SETTINGS="$AGENTS_DIR/claude-code/settings.json.example"
+                local PERMS_DIR="$AGENTS_DIR/claude-code/permissions"
+
+                if [ -x "$DETECT_SCRIPT" ] && [ -x "$BUILD_SCRIPT" ] && [ -d "$PERMS_DIR" ]; then
+                    local DETECTED_LANGS
+                    DETECTED_LANGS=$("$DETECT_SCRIPT" "$PROJECT_ROOT")
+                    if [ -n "$DETECTED_LANGS" ]; then
+                        # shellcheck disable=SC2086
+                        if "$BUILD_SCRIPT" "$BASE_SETTINGS" "$PERMS_DIR" $DETECTED_LANGS > "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null; then
+                            echo "✅ Claude Code settings added at .claude/settings.json"
+                            echo "   Detected languages: $(echo $DETECTED_LANGS | tr '\n' ' ')"
+                        else
+                            cp "$BASE_SETTINGS" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null
+                            echo "✅ Claude Code settings added at .claude/settings.json (base template)"
+                        fi
+                    else
+                        cp "$BASE_SETTINGS" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null
+                        echo "✅ Claude Code settings added at .claude/settings.json"
+                    fi
+                else
+                    cp "$BASE_SETTINGS" "$PROJECT_ROOT/.claude/settings.json" 2>/dev/null
                     echo "✅ Claude Code settings added at .claude/settings.json"
                 fi
             fi
+        fi
+
+        # Sync language-specific tool configs (only if language detected and file differs)
+        local DETECT_SCRIPT_SYNC=""
+        if [ -n "$STANDARDS_DIR" ]; then
+            DETECT_SCRIPT_SYNC="$STANDARDS_DIR/scripts/detect-languages.sh"
+        fi
+        [ ! -x "$DETECT_SCRIPT_SYNC" ] && DETECT_SCRIPT_SYNC="$SCRIPT_DIR/detect-languages.sh"
+
+        if [ -x "$DETECT_SCRIPT_SYNC" ]; then
+            local SYNC_LANGS
+            SYNC_LANGS=$("$DETECT_SCRIPT_SYNC" "$PROJECT_ROOT")
+            for lang in $SYNC_LANGS; do
+                local LANG_CONFIG_DIR="$AGENTS_DIR/$lang"
+                if [ -d "$LANG_CONFIG_DIR" ]; then
+                    (
+                        shopt -s dotglob nullglob
+                        for config_file in "$LANG_CONFIG_DIR"/*; do
+                            [ -f "$config_file" ] || continue
+                            config_name="$(basename "$config_file")"
+                            if [ ! -f "$PROJECT_ROOT/$config_name" ]; then
+                                if cp "$config_file" "$PROJECT_ROOT/$config_name" 2>/dev/null; then
+                                    echo "   ✅ Added $config_name ($lang)"
+                                fi
+                            elif ! cmp -s "$config_file" "$PROJECT_ROOT/$config_name" 2>/dev/null; then
+                                if [ "$UPDATED" = true ]; then
+                                    if cp "$config_file" "$PROJECT_ROOT/$config_name" 2>/dev/null; then
+                                        echo "   ✅ Updated $config_name ($lang)"
+                                    fi
+                                fi
+                            fi
+                        done
+                    )
+                fi
+            done
         fi
     fi
 

@@ -1,0 +1,4 @@
+# Dart/Flutter permissions
+Bash(dart *)
+Bash(flutter *)
+Bash(pub *)

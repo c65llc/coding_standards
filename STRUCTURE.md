@@ -45,6 +45,27 @@ This document explains the reorganized file hierarchy for easier navigation and 
 │   │   └── core-standards.md
 │   │
 │   └── agents/                    # AI agent-specific configurations
+│       ├── claude-code/
+│       │   ├── CLAUDE.md.template
+│       │   ├── settings.json.example
+│       │   └── permissions/       # Language-specific Claude Code permissions
+│       │       ├── python.txt
+│       │       ├── rust.txt
+│       │       ├── ruby.txt
+│       │       ├── javascript.txt
+│       │       ├── jvm.txt
+│       │       ├── swift.txt
+│       │       ├── dart.txt
+│       │       └── zig.txt
+│       ├── python/
+│       │   └── ruff.toml          # Python linter/formatter config
+│       ├── rust/
+│       │   ├── rustfmt.toml       # Rust formatter config
+│       │   └── clippy.toml        # Rust linter config
+│       ├── ruby/
+│       │   └── .rubocop.yml       # Ruby linter config
+│       ├── javascript/
+│       │   └── .prettierrc        # JS/TS formatter config
 │       ├── copilot/
 │       │   └── .github/
 │       │       └── copilot-instructions.md
@@ -57,7 +78,9 @@ This document explains the reorganized file hierarchy for easier navigation and 
 │
 ├── scripts/                        # 🔧 Automation scripts
 │   ├── setup.sh                   # Setup standards in a project
-│   └── sync-standards.sh          # Sync standards updates
+│   ├── sync-standards.sh          # Sync standards updates
+│   ├── detect-languages.sh        # Detect project languages via manifest files
+│   └── build-claude-settings.sh   # Build language-aware Claude Code settings
 │
 └── docs/                           # 📚 Documentation
     ├── README.md                  # Detailed guide (moved from root)

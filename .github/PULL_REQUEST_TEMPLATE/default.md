@@ -33,6 +33,18 @@ Closes #<!-- issue number -->
 - [ ] New and existing unit tests pass locally with my changes
 - [ ] I have performed a self-review of my own code
 
+## Security
+
+<!-- Review against sec-01 severity model. P0/P1 findings MUST block merge. -->
+
+- [ ] **P0 — No injection vulnerabilities** (SQL, command, XSS, SSRF, template injection)
+- [ ] **P0 — No hardcoded secrets** (API keys, passwords, tokens, connection strings)
+- [ ] **P1 — Authentication & authorization** checks are present where required
+- [ ] **P1 — No dangerous functions** (`eval()`, `exec()`, `system()`, insecure deserialization)
+- [ ] **P2 — Dependencies scanned** for known CVEs (lock file present, no pinned vulnerable versions)
+- [ ] **P2 — Sensitive data** not logged or exposed in error messages
+- [ ] N/A — These changes do not affect security-sensitive code
+
 ## Documentation
 
 <!-- Check all that apply -->

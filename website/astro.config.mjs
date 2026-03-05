@@ -37,6 +37,10 @@ export default defineConfig({
               label: 'Process',
               autogenerate: { directory: 'standards/process' },
             },
+            {
+              label: 'Security',
+              autogenerate: { directory: 'standards/security' },
+            },
           ],
         },
         {

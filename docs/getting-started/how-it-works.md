@@ -22,7 +22,9 @@ Coding Standards keeps every AI agent in your project aligned through a three-la
 │  └── agents/                     ← templates        │
 │      ├── copilot/                                   │
 │      ├── aider/                                     │
-│      └── codex/                                     │
+│      ├── claude-code/                               │
+│      ├── codex/                                     │
+│      └── <language>/            ← per-language      │
 │                                                     │
 │  scripts/                                           │
 │  ├── setup.sh                    ← one-time install │

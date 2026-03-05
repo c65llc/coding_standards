@@ -21,6 +21,6 @@ Files use category-based prefixes with zero-padded numbers:
 <category>-<number>_<descriptive_name>.md
 ```
 
-Examples: `arch-01_core_architecture.md`, `lang-05_dart_standards.md`, `sec-01_security_standards.md`
+Examples: `arch-01_project_standards_and_architecture.md`, `lang-05_dart_standards.md`, `sec-01_security_standards.md`
 
 When adding new standards, use the next available number in the appropriate category.

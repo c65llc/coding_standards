@@ -105,6 +105,7 @@ make sync-standards
 
 ## Next Steps
 
-- [Installation Guide](../getting-started/installation.md) for detailed setup options
+- [How It Works](./how-it-works.md) to understand the architecture and sync pipeline
+- [Installation Guide](./installation.md) for detailed setup options
 - [Multi-Agent Setup](../guides/multi-agent-setup.md) for configuring specific AI agents
 - [Customization Guide](../guides/customization.md) to adapt standards for your team

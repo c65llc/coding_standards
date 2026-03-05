@@ -31,6 +31,6 @@ curl -fsSL https://raw.githubusercontent.com/c65llc/coding-standards/main/instal
 
 ## Get Started
 
-Check out the [Quick Start guide](/getting-started/quick-start/) to get up and running in 5 minutes, or browse the [full documentation](/getting-started/installation/) for all installation options.
+Check out the [Quick Start guide](/getting-started/quick-start/) to get up and running in 5 minutes, learn [how it works](/getting-started/how-it-works/) under the hood, or browse the [full documentation](/getting-started/installation/) for all installation options.
 
 We welcome feedback via [GitHub Issues](https://github.com/c65llc/coding-standards/issues). If these standards don't fit your team perfectly, [fork the repo](/guides/customization/) and customize them.

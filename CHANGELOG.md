@@ -8,70 +8,85 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Security Standards Framework** (`standards/security/sec-01_security_standards.md`)
-  - P0-P2 severity model (P0/P1 block merge, P2 flagged as warning)
-  - Injection prevention (SQL, command, XSS, SSRF, template injection)
-  - Authentication & authorization requirements
-  - Secrets management and hardcoded credential detection
-  - Dangerous functions and insecure deserialization rules
-  - Dependency and supply chain security (CVE scanning, lock files)
-  - Configuration security (TLS, security headers, debug mode)
-  - Data protection (sensitive data in logs, PII, encryption)
-  - Per-language SAST and dependency scanning tooling reference
-- Security violation detection rules added to all agent configs (`.cursorrules`, `copilot-instructions.md`, `.aiderrc`, `.codexrc`, `GEMINI.md`)
-- Security sections added to all 11 language standards with language-specific tooling
-- Expanded security section in `core-standards.md` with P0/P1/P2 merge-blocking rules
-- Security checklist in `proc-03_code_review_expectations.md` updated with P0-P2 model
-- **GitHub Project Lifecycle Automation Suite**
-  - `bin/gh-task` - CLI tool for GitHub Projects V2 integration
-  - Commands: `create`, `start`, `status`, `update`, `submit`
-  - Automatic project status updates (Todo → In Progress → In Review → Done)
-  - Branch management with naming conventions (`task/<id>-<title>`)
-  - Pre-flight validation with test execution
-  - Draft PR creation with automatic issue linking
-- **Reusable GitHub Actions Workflows**
-  - `.github/workflows/lifecycle-sync.yml` - Auto-sync project status on PR events
-  - `.github/workflows/definition-of-done.yml` - Quality checks for PRs
-- **PR Templates**
-  - `.github/PULL_REQUEST_TEMPLATE/default.md` - Standard PR template with issue linking
-- **Configuration Templates**
-  - `templates/settings.json.example` - GitHub Projects V2 configuration
-  - `templates/gh-task.conf.example` - Alternative configuration format
-  - `templates/project-workflows.yml.example` - Example workflows for projects
-- **Comprehensive Documentation**
-  - `docs/GH_TASK_GUIDE.md` - Complete gh-task CLI reference (12k+ words)
-  - `docs/GH_TASK_QUICKSTART.md` - 5-minute quick start guide
-  - `docs/TOOLING.md` - Architecture and AI agent instructions (14k+ words)
-  - `docs/PROJECT_SETUP_EXAMPLE.md` - Complete project setup walkthrough
-- **Testing Infrastructure**
-  - `scripts/test-gh-task.sh` - Comprehensive test suite for gh-task
-  - `make test-gh-task` - Makefile target for testing
-- Multi-agent support for GitHub Copilot, Aider (Claude Code), OpenAI Codex, Gemini CLI, and Google Antigravity
-- `.github/copilot-instructions.md` for GitHub Copilot configuration
-- `.aiderrc` for Aider (Claude Code) configuration
-- `.codexrc` for OpenAI Codex configuration
-- `.gemini/GEMINI.md` for Gemini CLI and Antigravity repository intelligence
-- `.gemini/settings.json` for Gemini CLI configuration (checkpointing, model, MCP servers)
-- `standards/shared/core-standards.md` - Shared core standards for all agents
-- `standards/agents/` directory structure for agent-specific configurations
-- `make setup-agents` target for setting up AI agent configurations
-- `docs/MULTI_AGENT_GUIDE.md` - Comprehensive guide for multi-agent support
-- `REVIEW.md` - Codebase review and improvement plan
-- Updated setup and sync scripts to automatically configure all supported agents
+- `.github/CODEOWNERS` — default code ownership (proc-03 compliance)
+- `.github/dependabot.yml` — automated dependency updates for npm and GitHub Actions (sec-01 compliance)
+- `docs/adr/0001-unified-standards-repository.md` — foundational architecture decision record (proc-01 compliance)
+- `standards/README.md` — directory structure and naming convention overview (proc-01 compliance)
+- `bin/README.md` — gh-task CLI overview with documentation links (proc-01 compliance)
+- Security checklist (P0/P1/P2) in PR template (sec-01 compliance)
+- Security standards sync in website build pipeline
+- Security section in website sidebar
+- "How It Works" page on website with architecture and sync pipeline details
+- Blog posts covering project release history
 
 ### Changed
-- Updated `README.md` with GitHub Project Lifecycle Automation section
-- Updated `README.md` repository structure to include new components
-- Updated `scripts/setup.sh` to include gh-task setup instructions and detect/configure multiple AI agents (including Gemini CLI and Antigravity)
-- Updated `scripts/sync-standards.sh` to sync all agent configurations (including Gemini CLI and Antigravity)
-- Updated `install.sh` to reference gh-task tooling and show which agent configurations were installed
-- Updated `.gitignore` to exclude `.gh-task-state` and `.gh-task.conf` files
-- Updated `Makefile` with `test-gh-task` target
-- Updated `docs/MULTI_AGENT_GUIDE.md` to include Gemini CLI and Antigravity setup and usage instructions
-- Updated `STRUCTURE.md` to include new agent directories
-- Updated `.gitignore` to exclude `.gemini/active_mission.log` (Antigravity mission tracking)
+- Restructured `CHANGELOG.md` with versioned release sections
 
-### Improved
-- Better collaboration support for non-Cursor users
-- Consistent standards across all AI coding assistants
-- Enhanced documentation for multi-agent workflows
+## [0.5.0] - 2026-03-03
+
+### Added
+- **Language-aware bootstrap** for Claude Code settings (#24)
+  - Automatic language detection from project files
+  - Dynamic `settings.json` generation with language-specific tool configs
+  - CI test infrastructure for bootstrap validation
+
+### Fixed
+- Corrected invalid Claude Code `settings.json` template (#23)
+
+## [0.4.0] - 2026-03-03
+
+### Added
+- **Security Standards Framework** (`standards/security/sec-01_security_standards.md`) (#22)
+  - P0-P2 severity model (P0/P1 block merge, P2 flagged as warning)
+  - 8 security categories: injection, auth, secrets, dangerous functions, dependencies, config, data protection, SAST tooling
+  - Per-language SAST and dependency scanning tooling reference
+- Security violation detection rules added to all agent configs
+- Security sections added to all 10 language standards
+- Expanded security section in `core-standards.md`
+- Security checklist in `proc-03_code_review_expectations.md`
+
+## [0.3.0] - 2026-03-03
+
+### Added
+- **Ruby standards** (`lang-10_ruby_standards.md`) (#21)
+- **Ruby on Rails standards** (`lang-11_ruby_on_rails_standards.md`) (#21)
+
+### Changed
+- Restructured language file numbering to accommodate new languages (#21)
+
+## [0.2.0] - 2026-03-02
+
+### Added
+- `CLAUDE.md` for Claude Code project instructions (#20)
+- Gemini CLI and Antigravity support with `.gemini/` configuration (#20)
+- Marketing website with Starlight documentation site (#19)
+- Comprehensive documentation: getting started, guides, reference
+- `docs/changelog.md` for website changelog rendering
+
+### Changed
+- Updated setup/sync scripts with Gemini CLI detection (#20)
+- Public launch improvements: collaboration docs, CI workflows (#19)
+
+## [0.1.0] - 2025-12-22
+
+### Added
+- **GitHub Project Lifecycle Automation Suite**
+  - `bin/gh-task` — CLI tool for GitHub Projects V2 integration
+  - Commands: `create`, `start`, `status`, `update`, `submit`
+  - Automatic project status updates (Todo → In Progress → In Review → Done)
+  - Branch management with `task/<id>-<title>` naming convention
+- **Reusable GitHub Actions Workflows**
+  - `.github/workflows/lifecycle-sync.yml` — auto-sync project status on PR events
+  - `.github/workflows/definition-of-done.yml` — quality checks for PRs
+- **PR Templates** (`.github/PULL_REQUEST_TEMPLATE/default.md`)
+- **Configuration Templates** for GitHub Projects V2
+- **Comprehensive Documentation**
+  - `docs/GH_TASK_GUIDE.md` — complete gh-task CLI reference
+  - `docs/GH_TASK_QUICKSTART.md` — 5-minute quick start guide
+  - `docs/TOOLING.md` — architecture and AI agent instructions
+- **Testing Infrastructure** (`scripts/test-gh-task.sh`)
+- Multi-agent support: Cursor, Copilot, Claude Code/Aider, Codex
+- `standards/shared/core-standards.md` — canonical cross-cutting standards
+- Standards documents: architecture (3), languages (9), process (4)
+- Setup and sync scripts for standards distribution via git submodule
+- One-line installer (`install.sh`)

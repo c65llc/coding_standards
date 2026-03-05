@@ -67,6 +67,15 @@ for f in "$REPO_ROOT"/standards/process/*.md; do
     add_frontmatter "$f" "$CONTENT_DIR/standards/process/$(basename "$f")"
 done
 
+# Copy security standards
+if [ -d "$REPO_ROOT/standards/security" ]; then
+    mkdir -p "$CONTENT_DIR/standards/security"
+    for f in "$REPO_ROOT"/standards/security/*.md; do
+        [ -f "$f" ] || continue
+        add_frontmatter "$f" "$CONTENT_DIR/standards/security/$(basename "$f")"
+    done
+fi
+
 # Copy shared standards if exists
 if [ -d "$REPO_ROOT/standards/shared" ]; then
     mkdir -p "$CONTENT_DIR/standards/shared"

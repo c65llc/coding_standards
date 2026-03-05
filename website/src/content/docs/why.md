@@ -63,6 +63,8 @@ Contributors using any AI tool will generate code that follows your project's co
 3. **Develop** — Every AI tool follows the same standards automatically
 4. **Update** — `make sync-standards` pulls the latest and re-syncs everything
 
+See the full [How It Works](/getting-started/how-it-works/) page for the architecture, sync pipeline, and language-aware bootstrap details.
+
 ## Get Started
 
 Ready to unify your AI coding standards?

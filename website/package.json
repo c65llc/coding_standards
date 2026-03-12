@@ -14,6 +14,6 @@
     "@astrojs/starlight": "^0.37.6",
     "astro": "^5.0.0",
     "sharp": "^0.33.0",
-    "starlight-blog": "^0.25.3"
+    "starlight-blog": "^0.26.0"
   }
 }
